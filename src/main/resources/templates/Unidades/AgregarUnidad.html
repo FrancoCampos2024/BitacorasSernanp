@@ -1,0 +1,66 @@
+<!-- Fragmento: Modal para registrar unidad -->
+<div th:fragment="modalNuevaUnidad(unidad, tipounidad, tipocombustible)" xmlns:th="http://www.thymeleaf.org">
+    <div class="modal fade" id="modalNuevaUnidad" tabindex="-1" aria-labelledby="modalNuevaUnidadLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content border-0 shadow">
+
+                <form th:action="@{/Unidades/Agregar}" th:object="${unidad}" method="post">
+                    <div class="modal-header" style="background-color: #275d44;">
+                        <h5 class="modal-title fw-bold text-white" id="modalNuevaUnidadLabel">
+                            <i class="bi bi-journal-plus me-2"></i> REGISTRO DE UNIDAD
+                        </h5>
+                        <a th:href="@{/Unidades/ListaUnidades}" class="btn-close btn-close-white" role="button" aria-label="Cerrar"></a>
+                    </div>
+
+                    <div class="modal-body bg-light">
+                        <!-- Identificador -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">
+                                Identificador (N° Serie, N° de placa) <span style="color: red;">*</span>
+                            </label>
+                            <input type="text" class="form-control" th:field="*{identificador}" >
+                        </div>
+
+                        <!-- Nombre -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">
+                                Nombre Unidad <span style="color: red;">*</span>
+                            </label>
+                            <input type="text" class="form-control" th:field="*{nombre}" >
+                        </div>
+
+                        <!-- Tipo de Unidad -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">
+                                Tipo de Unidad <span style="color: red;">*</span>
+                            </label>
+                            <select class="form-select" th:field="*{tipoUnidad.idtipou}" >
+                                <option value="0">Seleccione tipo</option>
+                                <option th:each="tipo : ${tipounidad}" th:value="${tipo.idtipou}" th:text="${tipo.nombre}"></option>
+                            </select>
+                        </div>
+
+                        <!-- Tipo de Combustible -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">
+                                Tipo de Combustible <span style="color: red;">*</span>
+                            </label>
+                            <select class="form-select" th:field="*{tipoCombustible.idtipocombustible}" >
+                                <option value="0">Seleccione tipo</option>
+                                <option th:each="t : ${tipocombustible}" th:value="${t.idtipocombustible}" th:text="${t.nombre}"></option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer bg-white">
+                        <a th:href="@{/Unidades/ListaUnidades}" class="btn btn-outline-secondary rounded-pill">
+                            <i class="bi bi-x-circle me-1"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-success fw-bold">Registrar</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>

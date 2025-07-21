@@ -1,0 +1,138 @@
+<!-- Modal: Nueva Bitácora -->
+<div th:fragment="modalNuevaBitacora(bitacora,unidad, mesesDisponibles,anio)">
+    <div class="modal fade" id="modalNuevaBitacora" tabindex="-1" aria-labelledby="modalNuevaBitacoraLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <form th:action="@{/Bitacoras/Agregar/{id}(id=${unidad.idunidad})}" method="post" th:object="${bitacora}">
+                    <!-- Encabezado -->
+                    <div class="modal-header text-white rounded-top-4" style="background-color: #275d44;">
+                        <h5 class="modal-title fw-bold" id="modalNuevaBitacoraLabel">
+                            <i class="bi bi-journal-plus me-2"></i> NUEVA BITÁCORA
+                        </h5>
+                        <a th:href="@{/Bitacoras/Listabitacoras/{id}(id=${unidad.idunidad})}"
+                           class="btn-close btn-close-white" role="button" aria-label="Cerrar"></a>
+                    </div>
+
+                    <!-- Cuerpo del modal -->
+                    <div class="modal-body bg-light px-4 py-3">
+
+                        <!-- Mes -->
+                        <div class="form-floating mb-3">
+                            <select class="form-select" th:field="*{mes}" id="mes" required>
+                                <option value="0">Seleccione mes</option>
+                            </select>
+                            <label for="mes">
+                                <i class="bi bi-calendar-month me-1"></i>
+                                Mes <span style="color: red;">*</span>
+                            </label>
+                        </div>
+
+
+                        <!-- Año -->
+                        <div class="form-floating mb-3">
+                            <input type="number"
+                                   min="2020"
+                                   max="2100"
+                                   class="form-control"
+                                   id="anio"
+                                   name="anio"
+                                   placeholder="Año"
+                                   th:field="*{anio}"
+                                   required>
+                            <label for="anio">
+                                <i class="bi bi-calendar2-week me-1"></i>
+                                Año <span style="color: red;">*</span>
+                            </label>
+                        </div>
+
+
+                        <!-- Unidad (input oculto) -->
+                        <input type="hidden" id="idUnidad" name="unidad.idunidad" th:value="${unidad.idunidad}" />
+                    </div>
+
+                    <!-- Pie del modal -->
+                    <div class="modal-footer bg-white px-4 py-3">
+                        <a th:href="@{/Bitacoras/Listabitacoras/{id}(id=${unidad.idunidad})}"
+                           class="btn btn-outline-secondary rounded-pill">
+                            <i class="bi bi-x-circle me-1"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-success fw-bold rounded-pill">
+                            <i class="bi bi-check-circle me-1"></i> Guardar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <script th:inline="javascript">
+        document.addEventListener("DOMContentLoaded", function () {
+            const modal = document.getElementById("modalNuevaBitacora");
+            const anioInput = document.getElementById("anio");
+            const mesSelect = document.getElementById("mes");
+            const unidadInput = document.getElementById("idUnidad");
+
+            if (!modal || !anioInput || !mesSelect || !unidadInput) return;
+
+            function cargarMeses() {
+                const anio = anioInput.value;
+                const idUnidad = unidadInput.value;
+
+                if (!anio || !idUnidad) return;
+
+                fetch(`/Bitacoras/MesesDisponibles?idUnidad=${idUnidad}&anio=${anio}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        mesSelect.innerHTML = "<option value='0'>Seleccione mes</option>";
+                        data.forEach(mes => {
+                            const option = document.createElement("option");
+                            option.value = mes.numero;
+                            option.textContent = mes.nombre;
+                            mesSelect.appendChild(option);
+                        });
+                    })
+                    .catch(err => console.error("Error al cargar meses:", err));
+            }
+
+            modal.addEventListener("shown.bs.modal", cargarMeses);
+            anioInput.addEventListener("input", cargarMeses);
+        });
+    </script>
+
+    <script>
+        const inputAnio = document.getElementById('anio');
+
+
+        inputAnio.addEventListener('blur', function () {
+            let valor = parseInt(this.value);
+
+            if (!valor || valor === 0) {
+                this.value = 2020;
+            } else if (valor < 2020) {
+                this.value = 2020;
+            } else if (valor > 2100) {
+                this.value = 2100;
+            }
+        });
+
+
+        window.addEventListener('DOMContentLoaded', () => {
+            let valor = parseInt(inputAnio.value);
+            if (!valor || valor === 0) {
+                inputAnio.value = 2020;
+            }
+        });
+
+
+        inputAnio.addEventListener('focus', function () {
+            if (this.value == 2020) {
+                this.select();
+            }
+        });
+    </script>
+
+
+
+
+</div>

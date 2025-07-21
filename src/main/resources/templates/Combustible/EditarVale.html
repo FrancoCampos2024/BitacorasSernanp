@@ -1,0 +1,76 @@
+<!-- Fragmento: Modal para editar vale -->
+<div th:fragment="modalEditarVale(valecondato, grifos, tiposcombustible)">
+    <div class="modal fade" id="modalEditarVale" tabindex="-1" aria-labelledby="modalEditarValeLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content border-0 shadow">
+
+                <form th:action="@{/Combustible/Editado/{id}(id=${valecondato.idvcombustible})}" th:object="${valecondato}" method="post">
+                    <div class="modal-header" style="background-color: #275d44;">
+                        <h5 class="modal-title fw-bold text-white" id="modalEditarValeLabel">
+                            <i class="bi bi-pencil-square me-2"></i> EDITAR VALE
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" onclick="cerrarModalEditar()" aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body bg-light">
+                        <input type="hidden" th:field="*{idvcombustible}"/>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">
+                                N° Vale <span style="color: red;">*</span>:
+                            </label>
+                            <input type="text" class="form-control" th:field="*{nvale}" >
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">
+                                Fecha <span style="color: red;">*</span>:
+                            </label>
+                            <input type="date" class="form-control" th:field="*{fecha}"
+                                   th:value="${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">
+                                Grifo <span style="color: red;">*</span>:
+                            </label>
+                            <select class="form-select" th:field="*{grifo}" >
+                                <option value="" disabled>Seleccione un grifo</option>
+                                <option th:each="g : ${grifos}" th:value="${g.idgrifo}" th:text="${g.nombre}"></option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">
+                                Tipo de combustible <span style="color: red;">*</span>:
+                            </label>
+                            <select class="form-select" th:field="*{tipoCombustible}" >
+                                <option value="" disabled>Seleccione tipo</option>
+                                <option th:each="t : ${tiposcombustible}" th:value="${t.idtipocombustible}" th:text="${t.nombre}"></option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">
+                                Cantidad (gls) <span style="color: red;">*</span>:
+                            </label>
+                            <input type="number" step="0.1" class="form-control" th:field="*{cantidad}" >
+                        </div>
+                    </div>
+
+                    <div class="modal-footer bg-white">
+                        <button type="button" class="btn btn-outline-secondary" onclick="cerrarModalEditar()">Cancelar</button>
+                        <button type="submit" class="btn btn-success fw-bold">Guardar cambios</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function cerrarModalEditar() {
+            window.location.href = '/Combustible/Listavales';
+        }
+    </script>
+</div>

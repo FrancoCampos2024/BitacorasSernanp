@@ -1,0 +1,254 @@
+<!-- ListarTipoCombustible.html -->
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Tipo de Combustible</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" th:href="@{/css/estilos.css}" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+  <style>
+    .titulo-seccion {
+      font-weight: bold;
+      color: #2d4832;
+      font-size: 1.5rem;
+    }
+    .btn-nuevo {
+      background-color: #256d3a;
+      color: white;
+      font-weight: bold;
+    }
+    .btn-nuevo:hover {
+      background-color: #1f5c32;
+    }
+
+  </style>
+</head>
+<body>
+
+<div th:replace="Fragmentos/Menu :: navbar"></div>
+<div th:replace="Tipocombustible/AgregarTipoCombustible :: modalNuevoTipoCombustible (${TipoCombustible})"></div>
+<div th:replace="Tipocombustible/EditarTipoCombustible :: modalEditarTipoCombustible (${TipoCombustiblebd})"></div>
+
+<div class="container mt-4">
+  <div class="titulo-seccion mb-3">
+    <i class="bi bi-fuel-pump-fill me-2"></i>CATÁLOGO - TIPO DE COMBUSTIBLE
+  </div>
+
+  <div class="card shadow-sm border-0">
+    <div class="card-body rounded-4 p-4" style="background-color: #ffffff;">
+
+      <!-- Botón nuevo -->
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="text-success fw-bold mb-0">
+          <i class="bi bi-list-task me-1"></i> Lista de Tipos de Combustible
+        </h5>
+        <button class="btn btn-nuevo px-4 py-2 rounded-3 shadow-sm"
+                data-bs-toggle="modal" data-bs-target="#modalNuevoTipoCombustible">
+          <i class="bi bi-plus-circle me-1"></i> Nuevo
+        </button>
+      </div>
+
+      <!-- Tabla -->
+      <div class="table-responsive rounded-3">
+        <table class="table table-bordered table-hover table-sm align-middle shadow-sm text-center">
+          <thead class="table-success">
+          <tr>
+            <th class="py-2 px-3">ID</th>
+            <th class="py-2 px-3">Nombre</th>
+            <th class="py-2 px-3">Acciones</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:each="tipo : ${listaTipoCombustible}" class="small">
+            <td th:text="${tipo.idtipocombustible}">1</td>
+            <td th:text="${tipo.nombre}">Gasolina</td>
+            <td>
+              <!-- Editar -->
+              <a class="btn btn-sm btn-outline-primary rounded-circle me-1"
+                 th:href="@{/Catalogo/EditarTipocombustible/{id}(id=${tipo.idtipocombustible})}"
+                 th:classappend="${deshabilitados[tipo.idtipocombustible]} ? ' boton-deshabilitado' : ''"
+                 th:attr="title=${deshabilitados[tipo.idtipocombustible]} ? 'No se puede editar, está en uso' : 'Editar'">
+                <i class="bi bi-pencil-square"></i>
+              </a>
+
+              <!-- Eliminar -->
+              <a href="#" class="btn btn-sm btn-outline-danger rounded-circle"
+                 th:classappend="${deshabilitados[tipo.idtipocombustible]} ? ' boton-deshabilitado' : ''"
+                 th:attr="title=${deshabilitados[tipo.idtipocombustible]} ? 'No se puede eliminar, está en uso' : 'Eliminar'"
+                 th:attrappend="data-href=@{/Catalogo/EliminarTipoCombustible/{id}(id=${tipo.idtipocombustible})}"
+                 data-bs-toggle="modal" data-bs-target="#modalConfirmarEliminar">
+                <i class="bi bi-trash3"></i>
+              </a>
+            </td>
+          </tr>
+          <tr th:if="${#lists.isEmpty(listaTipoCombustible)}">
+            <td colspan="3" class="text-muted">No hay tipos registrados</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Paginación -->
+      <div class="d-flex justify-content-center mt-4">
+        <nav th:if="${listaTipoCombustible.totalPages > 1}" aria-label="Paginación">
+          <ul class="pagination pagination-sm mb-0">
+            <li class="page-item" th:classappend="${listaTipoCombustible.hasPrevious()} ? '' : 'disabled'">
+              <a class="page-link"
+                 th:href="@{|/Catalogo/TipoCombustible?pagina=${listaTipoCombustible.number - 1}|}">
+                <i class="bi bi-chevron-left"></i> Anterior
+              </a>
+            </li>
+            <li class="page-item disabled">
+              <a class="page-link"
+                 th:text="${listaTipoCombustible.number + 1} + ' / ' + ${listaTipoCombustible.totalPages}">1 / 1</a>
+            </li>
+            <li class="page-item" th:classappend="${listaTipoCombustible.hasNext()} ? '' : 'disabled'">
+              <a class="page-link"
+                 th:href="@{|/Catalogo/TipoCombustible?pagina=${listaTipoCombustible.number + 1}|}">
+                Siguiente <i class="bi bi-chevron-right"></i>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal éxito -->
+<div class="modal fade" id="modalGuardadoExito" tabindex="-1" th:if="${guardadoExito != null}" data-show>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-success shadow">
+      <div class="modal-body text-center">
+        <div class="text-success fs-1 mb-2">
+          <i class="bi bi-check-circle-fill"></i>
+        </div>
+        <h5 class="fw-bold">¡Guardado exitosamente!</h5>
+        <p>Se registró correctamente el tipo de combustible.</p>
+        <button class="btn btn-success" data-bs-dismiss="modal">
+          <i class="bi bi-check2-circle me-1"></i> Aceptar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal advertencia -->
+<div class="modal fade" id="modalAdvertencia" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content text-center shadow rounded-4">
+      <div class="mt-4">
+        <div class="d-inline-block rounded-circle bg-danger text-white" style="width: 70px; height: 70px; line-height: 70px; font-size: 32px;">
+          <i class="bi bi-x-circle-fill"></i>
+        </div>
+      </div>
+      <div class="mt-3">
+        <h5 class="fw-bold text-danger">Error</h5>
+      </div>
+      <div id="mensajeAdvertencia" class="px-4 mt-2 mb-3 text-secondary">
+        Aquí va el mensaje de validación
+      </div>
+      <div class="d-flex justify-content-center gap-2 mb-4">
+        <button type="button" class="btn btn-danger px-4" data-bs-dismiss="modal">
+          <i class="bi bi-x-lg"></i> Entendido
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Confirmación de Eliminación -->
+<div class="modal fade" id="modalConfirmarEliminar" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content text-center rounded-4 shadow-lg border-0">
+
+      <!-- Ícono de advertencia -->
+      <div class="mt-4">
+        <div class="d-inline-block rounded-circle bg-danger text-white"
+             style="width: 70px; height: 70px; line-height: 70px; font-size: 32px;">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+        </div>
+      </div>
+
+      <!-- Título -->
+      <div class="mt-3">
+        <h5 class="fw-bold text-danger">¿Estás seguro de eliminar?</h5>
+      </div>
+
+      <!-- Mensaje descriptivo -->
+      <div class="px-4 mt-2 mb-3 text-secondary">
+        Esta acción no se puede deshacer.<br>El registro será eliminado permanentemente del sistema.
+      </div>
+
+      <!-- Botones -->
+      <div class="d-flex justify-content-center gap-3 mb-4">
+        <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">
+          <i class="bi bi-x-circle me-1"></i> Cancelar
+        </button>
+        <a id="btnConfirmarEliminar" class="btn btn-danger fw-bold px-4" href="#">
+          <i class="bi bi-trash3-fill me-1"></i> Eliminar
+        </a>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  const eliminarModal = document.getElementById('modalConfirmarEliminar');
+  eliminarModal.addEventListener('show.bs.modal', function (event) {
+    const boton = event.relatedTarget;
+    const url = boton.getAttribute('data-href');
+    const confirmar = eliminarModal.querySelector('#btnConfirmarEliminar');
+    confirmar.setAttribute('href', url);
+  });
+</script>
+
+
+<script th:inline="javascript">
+  const mostrar = /*[[${mostrarModalerror}]]*/ false;
+  const mensaje = /*[[${Error}]]*/ '';
+  if (mostrar && mensaje) {
+    setTimeout(() => {
+      document.getElementById("mensajeAdvertencia").textContent = mensaje;
+      const modal = new bootstrap.Modal(document.getElementById("modalAdvertencia"));
+      modal.show();
+      modal._element.addEventListener('hidden.bs.modal', () => {
+        new bootstrap.Modal(document.getElementById("modalNuevoTipoCombustible")).show();
+      });
+    }, 300);
+  }
+</script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const modalElement = document.getElementById('modalGuardadoExito');
+    if (modalElement && modalElement.hasAttribute("data-show")) {
+      new bootstrap.Modal(modalElement).show();
+    }
+  });
+</script>
+
+<script th:if="${errorE}" th:inline="javascript">
+  document.addEventListener('DOMContentLoaded', function () {
+    const mensaje = /*[[${errorE}]]*/ 'Error desconocido';
+    document.getElementById('mensajeAdvertencia').innerText = mensaje;
+    const advertencia = new bootstrap.Modal(document.getElementById('modalAdvertencia'));
+    advertencia.show();
+    document.getElementById('modalAdvertencia').addEventListener('hidden.bs.modal', () => {
+      new bootstrap.Modal(document.getElementById('modalEditarTipoCombustible')).show();
+    });
+  });
+</script>
+<div th:if="${abrirModalEditar} and ${errorE} == null">
+  <script th:inline="javascript">
+    new bootstrap.Modal(document.getElementById('modalEditarTipoCombustible')).show();
+  </script>
+</div>
+
+</body>
+</html>

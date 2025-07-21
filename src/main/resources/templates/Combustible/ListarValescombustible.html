@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Listado de Vales - SIGCOB</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}" href="/css/estilos.css" />
+</head>
+<body>
+
+<div th:replace="Fragmentos/Menu :: navbar"></div>
+<div th:replace="Combustible/AgregarVale :: modalNuevoVale(${vale}, ${grifos}, ${tiposcombustible})"></div>
+<div th:replace="Combustible/EditarVale :: modalEditarVale(${valecondato}, ${grifos}, ${tiposcombustible})"></div>
+
+<!-- Contenido principal -->
+<div class="container mt-4">
+    <!-- Título -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="titulo d-flex align-items-center">
+            <i class="bi bi-card-list me-2"></i>
+            LISTADO DE VALES DE COMBUSTIBLE
+        </h3>
+    </div>
+
+    <!-- Bloque de filtros dinámicos centrado con cabecera verde -->
+    <form id="formFiltros" method="get" th:action="@{/Combustible/Listavales}">
+        <div class="row justify-content-center mb-4">
+            <div class="col-lg-10">
+                <div class="card shadow-sm border-success">
+                    <div class="card-header bg-success text-white fw-bold d-flex align-items-center">
+                        <i class="bi bi-funnel-fill me-2"></i> FILTROS DE BÚSQUEDA
+                    </div>
+                    <div class="card-body bg-light">
+                        <div class="row g-3 align-items-end">
+                            <!-- Filtro por número de vale -->
+                            <div class="col-md-4">
+                                <label for="numeroVale" class="form-label fw-bold">N° de Vale</label>
+                                <input type="text" id="numeroVale" name="numeroVale"
+                                       th:value="${numeroVale}" class="form-control"
+                                       placeholder="Ej. 2024-001">
+                            </div>
+
+                            <!-- Filtro por fecha desde -->
+                            <div class="col-md-4">
+                                <label for="desde" class="form-label fw-bold">Desde</label>
+                                <input type="date" id="desde" name="desde"
+                                       th:value="${#dates.format(desde, 'yyyy-MM-dd')}" class="form-control">
+                            </div>
+
+                            <!-- Filtro por fecha hasta -->
+                            <div class="col-md-4">
+                                <label for="hasta" class="form-label fw-bold">Hasta</label>
+                                <input type="date" id="hasta" name="hasta"
+                                       th:value="${#dates.format(hasta, 'yyyy-MM-dd')}" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+
+
+
+
+    <!-- Tabla centrada -->
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="w-100 text-end mb-3">
+                <a class="btn btn-nuevo" data-bs-toggle="modal" data-bs-target="#modalNuevoVale">+Nuevo</a>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle bg-white text-center">
+                    <thead>
+                    <tr>
+                        <th>N° Vale</th>
+                        <th>Fecha</th>
+                        <th>Grifo</th>
+                        <th>Tipo de combustible</th>
+                        <th>Cantidad</th>
+                        <th>Saldo Restante</th>
+                        <th>Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="vale : ${valescombustible}">
+                        <td th:text="${vale.nvale}"></td>
+                        <td th:text="${#dates.format(vale.fecha, 'dd/MM/yyyy')}"></td>
+                        <td th:text="${vale.grifo.nombre}"></td>
+                        <td th:text="${vale.tipoCombustible.nombre}"></td>
+                        <td th:text="${vale.cantidad}"></td>
+                        <td th:text="${vale.saldorestante}"></td>
+                        <td>
+                            <a th:href="@{/Combustible/Detalle/{id}(id=${vale.idvcombustible})}" class="icono-accion" title="Ver Información">
+                                <i class="bi bi-info-circle-fill"></i>
+                            </a>
+
+                            <!-- Solo mostrar si NO ha sido consumido -->
+                            <span th:if="${vale.saldorestante == vale.cantidad}">
+                                <a th:href="@{/Combustible/Editar/{id}(id=${vale.idvcombustible})}" class="icono-accion" title="Editar">
+                                    <i class="bi bi-pencil-square"></i>
+                                    </a>
+                            </span>
+
+
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div class="d-flex justify-content-center mt-3">
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination">
+                            <li class="page-item" th:classappend="${valescombustible.hasPrevious()} ? '' : 'disabled'">
+                                <a class="page-link" th:href="@{|/Combustible/Listavales?pagina=${valescombustible.number - 1}|}">Anterior</a>
+                            </li>
+                            <li class="page-item disabled">
+                                <a class="page-link" th:text="${valescombustible.number + 1} + ' / ' + ${valescombustible.totalPages}">1 / 1</a>
+                            </li>
+                            <li class="page-item" th:classappend="${valescombustible.hasNext()} ? '' : 'disabled'">
+                                <a class="page-link" th:href="@{|/Combustible/Listavales?pagina=${valescombustible.number + 1}|}">Siguiente</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+
+<!-- Modal de Éxito -->
+<div class="modal fade" id="modalGuardadoExito" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content text-center rounded-4 shadow-lg">
+            <div class="mt-4">
+                <div class="d-inline-block rounded-circle bg-success text-white"
+                     style="width: 70px; height: 70px; line-height: 70px; font-size: 32px;">
+                    <i class="bi bi-check-circle-fill"></i>
+                </div>
+            </div>
+            <div class="mt-3">
+                <h5 class="fw-bold text-success">Guardado correctamente</h5>
+            </div>
+            <div class="d-flex justify-content-center gap-2 mb-4">
+                <button type="button" class="btn btn-success px-4" data-bs-dismiss="modal">
+                    <i class="bi bi-check"></i> Aceptar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Advertencia → Estilo Error (Rojo) -->
+<div class="modal fade" id="modalAdvertencia" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content text-center rounded-4 shadow-lg">
+            <div class="mt-4">
+                <div class="d-inline-block rounded-circle bg-danger text-white"
+                     style="width: 70px; height: 70px; line-height: 70px; font-size: 32px;">
+                    <i class="bi bi-x-circle-fill"></i>
+                </div>
+            </div>
+            <div class="mt-3">
+                <h5 class="fw-bold text-danger">Error</h5>
+            </div>
+            <div id="mensajeAdvertencia" class="px-4 mt-2 mb-3 text-secondary" th:text="${Error}">
+                Aquí va el mensaje de validación
+            </div>
+            <div class="d-flex justify-content-center gap-2 mb-4">
+                <button type="button" class="btn btn-danger text-white px-4" id="btnAdvertenciaEntendido"
+                        data-bs-dismiss="modal">
+                    <i class="bi bi-x-lg"></i> Entendido
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+
+    let error = /*[[${Error != null}]]*/ false;
+    let errorMsg = /*[[${Error}]]*/ '';
+    let abrirAgregar = /*[[${abrirModalAgregar}]]*/ false;
+    let abrirEditar = /*[[${abrirModalEditar}]]*/ false;
+    let guardado = /*[[${guardadoExito != null}]]*/ false;
+
+    if (error) {
+        const modalAdvertencia = new bootstrap.Modal(document.getElementById('modalAdvertencia'));
+        document.getElementById('mensajeAdvertencia').innerText = errorMsg;
+        modalAdvertencia.show();
+
+        const btn = document.getElementById('btnAdvertenciaEntendido');
+        btn.onclick = function () {
+            if (abrirAgregar) {
+                new bootstrap.Modal(document.getElementById('modalNuevoVale')).show();
+            }
+            if (abrirEditar) {
+                new bootstrap.Modal(document.getElementById('modalEditarVale')).show();
+            }
+        };
+    } else {
+        if (abrirAgregar) {
+            new bootstrap.Modal(document.getElementById('modalNuevoVale')).show();
+        }
+        if (abrirEditar) {
+            new bootstrap.Modal(document.getElementById('modalEditarVale')).show();
+        }
+    }
+
+    if (guardado) {
+        new bootstrap.Modal(document.getElementById('modalGuardadoExito')).show();
+    }
+
+    /*]]>*/
+</script>
+
+<script>
+    const form = document.getElementById('formFiltros');
+    const inputVale = document.getElementById('numeroVale');
+    let timer = null;
+
+    // Detectar si deja de escribir por 1 segundo
+    inputVale.addEventListener('input', function () {
+        clearTimeout(timer);
+
+        // Solo enviar si el campo tiene más de 2 caracteres o está vacío (borrar filtro)
+        timer = setTimeout(() => {
+            if (this.value.trim().length >= 3 || this.value.trim().length === 0) {
+                form.submit();
+            }
+        }, 1000); // 1000 ms = 1 segundo
+    });
+
+    // Enviar si cambian las fechas
+    document.getElementById('desde').addEventListener('change', () => form.submit());
+    document.getElementById('hasta').addEventListener('change', () => form.submit());
+</script>
+
+
+
+
+
+
+</body>
+</html>

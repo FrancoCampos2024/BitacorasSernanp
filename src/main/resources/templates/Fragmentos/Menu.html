@@ -1,0 +1,69 @@
+<!-- Fragmento del menú de navegación -->
+<div th:fragment="navbar" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+    <nav class="navbar navbar-expand-lg shadow-sm" style="background-color: #256d3a;">
+        <div class="container-fluid">
+
+            <!-- Nombre del sistema -->
+            <a class="navbar-brand fw-bold text-white fs-2 me-4" th:href="@{/Bienvenido}" title="Ir al inicio">
+                SIGCOB
+            </a>
+
+            <!-- Menú principal -->
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
+                    <!-- Dropdown: Unidades y Bitácoras -->
+                    <li class="nav-item dropdown" sec:authorize="hasAnyRole('ADMIN','GUARDAPARQUE')">
+                        <a class="nav-link dropdown-toggle text-white fw-semibold" href="#" id="bitacoraDropdown"
+                           role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            UNIDADES Y BITÁCORAS
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="bitacoraDropdown">
+                            <li>
+                                <a class="dropdown-item" th:href="@{/Unidades/ListaUnidades}">
+                                    Gestión de Unidades y Bitácoras
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" th:href="@{/Unidades/ReporteMensual}">
+                                    Reporte Mensual de Bitácoras
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <!-- Solo ADMIN puede ver COMBUSTIBLE -->
+                    <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                        <a class="nav-link text-white fw-semibold" th:href="@{/Combustible/Listavales}">
+                            COMBUSTIBLE
+                        </a>
+                    </li>
+
+                    <!-- Solo ADMIN puede ver CATÁLOGO -->
+                    <li class="nav-item dropdown" sec:authorize="hasRole('ADMIN')">
+                        <a class="nav-link dropdown-toggle text-white fw-semibold" href="#" id="datosOperativosDropdown"
+                           role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            CATÁLOGO DE DATOS OPERATIVOS
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="datosOperativosDropdown">
+                            <li><a class="dropdown-item" th:href="@{/Catalogo/TipoUnidad}">Tipo de Unidad</a></li>
+                            <li><a class="dropdown-item" th:href="@{/Catalogo/TipoCombustible}">Tipo de Combustible</a></li>
+                            <li><a class="dropdown-item" th:href="@{/Catalogo/Grifo}">Grifos</a></li>
+                            <li><a class="dropdown-item" th:href="@{/Catalogo/Destino}">Destinos</a></li>
+                            <li><a class="dropdown-item" th:href="@{/Catalogo/Responsable}">Responsables</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Botón cerrar sesión -->
+            <form th:action="@{/logout}" method="post" class="d-flex">
+                <button class="btn btn-sm btn-outline-light" type="submit" title="Cerrar sesión">
+                    <i class="bi bi-box-arrow-right"></i>
+                </button>
+            </form>
+
+        </div>
+    </nav>
+</div>

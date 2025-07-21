@@ -1,0 +1,56 @@
+<!-- Modal para Registrar Tipo de Unidad -->
+<div th:fragment="modalNuevoTipoUnidad(TipoUnidad)">
+    <div class="modal fade" id="modalNuevoTipoUnidad" tabindex="-1" aria-labelledby="tituloModalTipoUnidad" aria-hidden="true">
+        <div class="modal-dialog">
+            <form th:action="@{/Catalogo/Agregadotipounidad}" th:object="${TipoUnidad}" method="post" class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title fw-bold" id="tituloModalTipoUnidad">
+                        <i class="bi bi-plus-circle me-2"></i> Nuevo Tipo de Unidad
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+
+                <div class="modal-body bg-light">
+                    <!-- Nombre -->
+                    <div class="mb-3">
+                        <label for="nombre" class="form-label fw-bold">
+                            Nombre del tipo <span style="color: red;">*</span>
+                        </label>
+                        <input type="text"
+                               class="form-control form-control-sm"
+                               id="nombre"
+                               name="nombre"
+                               th:field="*{nombre}"
+                               placeholder="Ej: Vehículo Liviano"
+                               >
+                    </div>
+
+                    <!-- Medición -->
+                    <div class="mb-3">
+                        <label for="medicion" class="form-label fw-bold">
+                            Medición <span style="color: red;">*</span>
+                        </label>
+                        <select class="form-select form-select-sm"
+                                id="medicion"
+                                name="medicion"
+                                th:field="*{medicion}"
+                                >
+                            <option value="">Seleccione una medición</option>
+                            <option value="Km">Km</option>
+                            <option value="Horas">Horas</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="modal-footer bg-light">
+                    <button type="submit" class="btn btn-success fw-bold">
+                        <i class="bi bi-save me-1"></i> Guardar
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-1"></i> Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

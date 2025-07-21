@@ -1,0 +1,71 @@
+<!-- Fragmento: Modal para registrar vale -->
+<div th:fragment="modalNuevoVale(vale, grifos, tiposcombustible)">
+  <div class="modal fade" id="modalNuevoVale" tabindex="-1" aria-labelledby="modalNuevoValeLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content border-0 shadow">
+
+        <form th:object="${vale}" th:action="@{/Combustible/Agregar}" method="post">
+          <div class="modal-header" style="background-color: #275d44;">
+            <h5 class="modal-title fw-bold text-white" id="modalNuevoValeLabel">
+              <i class="bi bi-journal-plus me-2"></i> REGISTRO DE VALE
+            </h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+
+          <div class="modal-body bg-light">
+            <div class="mb-3">
+              <label class="form-label fw-bold">
+                N° Vale <span style="color: red;">*</span>:
+              </label>
+              <input type="number" class="form-control"
+                     th:field="*{nvale}"
+                     min="0"
+                     onblur="if(this.value==='') this.value=0;">
+
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-bold">
+                Fecha <span style="color: red;">*</span>:
+              </label>
+              <input type="date" class="form-control" th:field="*{fecha}" >
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-bold">
+                Grifo <span style="color: red;">*</span>:
+              </label>
+              <select class="form-select" th:field="*{grifo}" required>
+                <option value="0">Seleccione un grifo</option>
+                <option th:each="g : ${grifos}" th:value="${g.idgrifo}" th:text="${g.nombre}"></option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-bold">
+                Tipo de combustible <span style="color: red;">*</span>:
+              </label>
+              <select class="form-select" th:field="*{tipoCombustible}" required>
+                <option value="0">Seleccione tipo</option>
+                <option th:each="t : ${tiposcombustible}" th:value="${t.idtipocombustible}" th:text="${t.nombre}"></option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-bold">
+                Cantidad (gls) <span style="color: red;">*</span>:
+              </label>
+              <input type="number" step="0.1" class="form-control" th:field="*{cantidad}" required>
+            </div>
+          </div>
+
+          <div class="modal-footer bg-white">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-success fw-bold">Registrar</button>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+</div>

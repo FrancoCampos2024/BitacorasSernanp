@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Detalle por Kilómetros</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet"/>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}" />
+    <style>
+        body {
+            background-color: #f5f7fa;
+        }
+        .titulo-seccion {
+            font-weight: bold;
+            color: #2d4832;
+            font-size: 1.4rem;
+        }
+        .btn-guardar {
+            background-color: #256d3a;
+            color: white;
+            font-weight: bold;
+        }
+        .btn-guardar:hover {
+            background-color: #1f5c32;
+        }
+    </style>
+</head>
+<body>
+
+<div th:replace="Fragmentos/Menu :: navbar"></div>
+
+<div class="container mt-4">
+
+    <!-- Título -->
+    <div class="titulo-seccion mb-2">
+        <i class="bi bi-pencil-square me-2"></i> EDITAR DETALLE - MEDICIÓN POR KILÓMETROS
+    </div>
+    <div class="card shadow-sm mb-3">
+        <div class="d-flex flex-wrap gap-4">
+            <div><strong>Mes:</strong> <span th:text="${bitacora.mes}">Abril</span></div>
+            <div><strong>Año:</strong> <span th:text="${bitacora.anio}">2025</span></div>
+            <div><strong>Unidad:</strong> <span th:text="${bitacora.unidad.nombre}">15RTX</span></div>
+        </div>
+    </div>
+
+    <!-- Formulario -->
+    <form id="formEditarBitacora" th:action="@{/Bitacoras/EditadodetallebitacoraKM/{iddb}/{idb}(iddb=${DetallebitacoraKM.iddetallekm},idb=${bitacora.idbitacora})}" method="post" th:object="${DetallebitacoraKM}">
+
+        <div class="row g-3">
+
+            <!-- Día -->
+            <div class="col-md-2">
+                <label class="form-label">Día</label>
+                <div class="form-control bg-light border rounded fw-semibold text-dark ps-2">
+                    <span th:text="${DetallebitacoraKM.dia}">10</span>
+                </div>
+                <input type="hidden" th:field="*{dia}" />
+            </div>
+
+            <!-- Km -->
+            <div class="col-md-2">
+                <label class="form-label">Km Inicial</label>
+                <input type="number" class="form-control" th:field="*{kminicial}" min="0" step="1" data-int-positivo >
+            </div>
+
+            <div class="col-md-2">
+                <label class="form-label">Km Final</label>
+                <input type="number" class="form-control" th:field="*{kmfinal}" min="0" step="1" data-int-positivo >
+            </div>
+
+            <div class="col-md-2">
+                <label class="form-label">Km Recorridos</label>
+                <input type="number" class="form-control" th:field="*{kmrecorridos}" readonly min="0" step="1" data-int-positivo>
+            </div>
+
+            <div class="col-md-2">
+                <label class="form-label">Combustible (gl)</label>
+                <input type="number" class="form-control" th:field="*{combustiblegls}" min="0" step="0.1" data-decimal-positivo>
+            </div>
+
+            <div class="col-md-2">
+                <label class="form-label">Vale - Destino - Cantidad (gls)</label>
+                <select class="form-select" th:field="*{destinovale.iddestinovale}" >
+                    <option value="0" >Seleccione</option>
+                    <option th:each="v : ${vales}" th:value="${v.iddestinovale}" th:text="'Nº ' + ${v.valeCombustible.nvale} + ' - '+${v.destino.destino}+' - ' + ${v.saldorestante + ' gls'}"></option>
+                </select>
+            </div>
+
+        </div>
+
+        <hr>
+
+        <div class="row g-3">
+            <!-- Aceites -->
+            <div class="col-md-3">
+                <label class="form-label">Aceite Motor</label>
+                <input type="number" class="form-control" th:field="*{aceitemotor}" data-int-positivo>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">Aceite Transmisión</label>
+                <input type="number" class="form-control" th:field="*{aceitetransmision}" data-int-positivod>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">Filtro Aceite</label>
+                <input type="text" class="form-control" th:field="*{filtroaceitecambio}">
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">Filtro Purificador</label>
+                <input type="text" class="form-control" th:field="*{filtropurificadorcambio}">
+            </div>
+
+            <!-- Otros -->
+            <div class="col-md-3">
+                <label class="form-label">Batería Cambio</label>
+                <input type="text" class="form-control" th:field="*{bateriacambio}">
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">Engrase</label>
+                <input type="text" class="form-control" th:field="*{serviciengrase}">
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">Mantenimiento</label>
+                <input type="text" class="form-control" th:field="*{serviciomantenimiento}">
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">Responsable</label>
+                <select class="form-select" th:field="*{responsable.idresponsable}" required>
+                    <option value="0" disabled>Seleccione</option>
+                    <option th:each="r : ${responsables}" th:value="${r.idresponsable}" th:text="${r.nombre + ' ' + r.apellidopaterno}"></option>
+                </select>
+            </div>
+        </div>
+
+        <hr>
+
+        <!-- Texto amplio -->
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label">Trabajos Realizados</label>
+                <textarea class="form-control" th:field="*{trabajosrealizados}" rows="3"></textarea>
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Anotaciones</label>
+                <textarea class="form-control" th:field="*{anotaciones}" rows="3"></textarea>
+            </div>
+        </div>
+
+        <!-- Botones -->
+        <div class="mt-4 d-flex justify-content-end gap-2">
+            <a th:href="@{/Bitacoras/Detallebitacora/{id}(id=${bitacora.idbitacora})}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left-circle"></i> Cancelar
+            </a>
+            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalConfirmarModificacion">
+                <i class="bi bi-pencil-square me-1"></i> Guardar
+            </button>
+        </div>
+    </form>
+
+</div>
+
+
+<!-- Modal para confirmar modificación -->
+<div class="modal fade" id="modalConfirmarModificacion" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content text-center rounded-4 shadow-lg">
+            <!-- Círculo amarillo con ícono centrado -->
+            <div class="mt-4">
+                <div class="d-inline-block rounded-circle bg-warning text-white" style="width: 70px; height: 70px; line-height: 70px; font-size: 32px;">
+                    <i class="bi bi-exclamation-circle-fill"></i>
+                </div>
+            </div>
+            <!-- Título -->
+            <div class="mt-3">
+                <h5 class="fw-bold text-warning">¿Deseas modificar este registro?</h5>
+            </div>
+            <!-- Mensaje -->
+            <div class="px-4 mt-2 mb-3 text-secondary">
+                Verifica que todos los datos sean correctos antes de continuar.<br>
+                Una vez modificado, se actualizarán los valores en el sistema.
+            </div>
+            <!-- Botones -->
+            <div class="d-flex justify-content-center gap-3 mb-4">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    Cancelar
+                </button>
+                <button type="button" class="btn btn-warning text-white px-4" onclick="document.getElementById('formEditarBitacora').submit();">
+                    <i class="bi bi-pencil-square me-1"></i> Aceptar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de validación en rojo (sin borde) -->
+<div class="modal fade" id="modalErrorValidacion" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content text-center rounded-4 shadow-lg">
+            <div class="mt-4">
+                <div class="d-inline-block rounded-circle bg-danger text-white"
+                     style="width: 70px; height: 70px; line-height: 70px; font-size: 32px;">
+                    <i class="bi bi-x-circle-fill"></i>
+                </div>
+            </div>
+            <div class="mt-3">
+                <h5 class="fw-bold text-danger">Error de Validación</h5>
+            </div>
+            <div id="mensajeErrorValidacion" class="px-4 mt-2 mb-3 text-secondary"
+                 th:text="${errorValidacion}">Aquí irá el mensaje del backend</div>
+            <div class="d-flex justify-content-center gap-2 mb-4">
+                <button type="button" class="btn btn-danger text-white px-4" data-bs-dismiss="modal">
+                    <i class="bi bi-x-lg"></i> Entendido
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Mostrar modal si hay mensaje de error -->
+<script th:if="${errorValidacion != null}">
+    document.addEventListener("DOMContentLoaded", function () {
+        const modal = new bootstrap.Modal(document.getElementById('modalErrorValidacion'));
+        modal.show();
+    });
+</script>
+
+
+
+<script>
+    // Script para calcular km recorridos automáticamente
+    document.addEventListener("DOMContentLoaded", function () {
+        const kmInicial = document.querySelector('[name="kminicial"]');
+        const kmFinal = document.querySelector('[name="kmfinal"]');
+        const kmRecorridos = document.querySelector('[name="kmrecorridos"]');
+
+        function actualizarKm() {
+            const ini = parseInt(kmInicial.value) || 0;
+            const fin = parseInt(kmFinal.value) || 0;
+            if (fin >= ini) {
+                kmRecorridos.value = fin - ini;
+            } else {
+                kmRecorridos.value = 0;
+            }
+        }
+
+        kmInicial.addEventListener('input', actualizarKm);
+        kmFinal.addEventListener('input', actualizarKm);
+        actualizarKm(); // Ejecuta al cargar
+    });
+</script>
+
+<script>
+    // Validación para enteros positivos (sin letras ni símbolos)
+    function validarEntero(input) {
+        input.value = input.value.replace(/\D/g, '');
+        if (input.value === '') {
+            input.value = '0';
+        }
+    }
+
+    // Validación para decimales positivos (permite solo un punto)
+    function validarDecimal(input) {
+        input.value = input.value.replace(/[^\d.]/g, '');
+
+        const partes = input.value.split('.');
+        if (partes.length > 2) {
+            input.value = partes[0] + '.' + partes[1];
+        }
+
+        if (input.value.startsWith('.')) {
+            input.value = '0' + input.value;
+        }
+
+        if (input.value === '') {
+            input.value = '0';
+        }
+    }
+
+    // Lógica compartida con autolimpieza del "0" al escribir
+    function prepararCampo(input, tipo) {
+        // Limpia el "0" si es lo único en el campo al hacer foco
+        input.addEventListener('focus', function () {
+            if (input.value === '0') {
+                input.value = '';
+            }
+        });
+
+        // Validación en tiempo real
+        input.addEventListener('input', function () {
+            if (tipo === 'entero') {
+                validarEntero(input);
+            } else if (tipo === 'decimal') {
+                validarDecimal(input);
+            }
+        });
+
+        // Restaura el "0" si queda vacío al salir
+        input.addEventListener('blur', function () {
+            if (input.value.trim() === '') {
+                input.value = '0';
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('[data-int-positivo]').forEach(input => {
+            prepararCampo(input, 'entero');
+        });
+
+        document.querySelectorAll('[data-decimal-positivo]').forEach(input => {
+            prepararCampo(input, 'decimal');
+        });
+    });
+</script>
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
