@@ -8,7 +8,14 @@
     <link rel="stylesheet" th:href="@{/css/estilos.css}" />
     <style>
         body {
-            background-color: #f5f7fa;
+            background-color: #e9f5ee;
+            color: #212529;
+        }
+
+        .card, .table, .modal-content {
+            background-color: #ffffff;
+            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+            border-radius: 0.5rem;
         }
         .titulo-seccion {
             font-weight: bold;
@@ -35,7 +42,25 @@
             <i class="bi bi-pencil-square me-2"></i> AGREGAR DETALLE - MEDICIÓN POR HORAS
         </div>
         <div class="d-flex flex-wrap gap-4">
-            <div><strong>Mes:</strong> <span th:text="${bitacora.mes}">Abril</span></div>
+            <div>
+                <strong>Mes:</strong>
+                <span th:switch="${bitacora.mes}">
+                    <span th:case="1">Enero</span>
+                    <span th:case="2">Febrero</span>
+                    <span th:case="3">Marzo</span>
+                    <span th:case="4">Abril</span>
+                    <span th:case="5">Mayo</span>
+                    <span th:case="6">Junio</span>
+                    <span th:case="7">Julio</span>
+                    <span th:case="8">Agosto</span>
+                    <span th:case="9">Septiembre</span>
+                    <span th:case="10">Octubre</span>
+                    <span th:case="11">Noviembre</span>
+                    <span th:case="12">Diciembre</span>
+                    <span th:case="*">Mes inválido</span>
+                </span>
+            </div>
+
             <div><strong>Año:</strong> <span th:text="${bitacora.anio}">2025</span></div>
             <div><strong>Unidad:</strong> <span th:text="${bitacora.unidad.nombre}">15RTX</span></div>
         </div>
@@ -234,6 +259,20 @@
         modal.show();
     });
 </script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll("form").forEach(form => {
+            form.addEventListener("submit", function () {
+                const boton = form.querySelector("button[type='submit']");
+                if (boton) {
+                    boton.disabled = true;
+                    boton.innerHTML = '<i class="bi bi-clock-history"></i> Guardando...';
+                }
+            });
+        });
+    });
+</script>
+
 
 
 </body>

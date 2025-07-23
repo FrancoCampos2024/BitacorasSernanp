@@ -8,7 +8,14 @@
   <link rel="stylesheet" th:href="@{/css/estilos.css}" />
   <style>
     body {
-      background-color: #f9f9f9;
+      background-color: #e9f5ee; /* fondo */
+      color: #212529;            /* texto principal */
+    }
+
+    .card, .table, .modal-content {
+      background-color: #ffffff; /* contraste con el fondo */
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+      border-radius: 0.5rem;
     }
     .titulo-seccion {
       font-weight: bold;
@@ -44,7 +51,25 @@
   <div class="titulo-seccion mb-2">BITÁCORA - MOTOR <span th:text="${bitacora.unidad.nombre}">15RTX</span></div>
   <div class="card shadow-sm mb-3">
     <div class="d-flex flex-wrap gap-3 mb-3">
-      <div><strong>Mes:</strong> <span th:text="${bitacora.mes}">Abril</span></div>
+      <div>
+        <strong>Mes:</strong>
+        <span th:switch="${bitacora.mes}">
+              <span th:case="1">Enero</span>
+              <span th:case="2">Febrero</span>
+              <span th:case="3">Marzo</span>
+              <span th:case="4">Abril</span>
+              <span th:case="5">Mayo</span>
+              <span th:case="6">Junio</span>
+              <span th:case="7">Julio</span>
+              <span th:case="8">Agosto</span>
+              <span th:case="9">Septiembre</span>
+              <span th:case="10">Octubre</span>
+              <span th:case="11">Noviembre</span>
+              <span th:case="12">Diciembre</span>
+              <span th:case="*">Mes inválido</span>
+        </span>
+      </div>
+
       <div><strong>Año:</strong> <span th:text="${bitacora.anio}">2025</span></div>
       <div><strong>Identificador:</strong> <span th:text="${bitacora.unidad.identificador}">71548954</span></div>
     </div>
@@ -87,13 +112,17 @@
         <td th:text="${detalle.justificacion}">Patrullaje</td>
         <td th:text="${detalle.responsable.nombre}">Fidel Ricra</td>
         <td th:text="${detalle?.destinovale?.valeCombustible?.nvale} ?: '—'">—</td>
-        <td>
-          <button type="button" class="btn btn-sm btn-outline-danger"
+        <td class="text-center">
+          <button type="button"
+                  class="btn btn-sm btn-outline-danger d-flex align-items-center"
                   th:attr="data-id=${detalle.iddetallebitacora}, data-bitacora=${bitacora.idbitacora}"
-                  data-bs-toggle="modal" data-bs-target="#modalEliminarUnico">
-            <i class="bi bi-trash3"></i>
+                  data-bs-toggle="modal"
+                  data-bs-target="#modalEliminarUnico"
+                  title="Eliminar este detalle">
+            <i class="bi bi-trash3 me-1"></i> Eliminar
           </button>
         </td>
+
       </tr>
       <tr th:if="${#lists.isEmpty(detallebitacorahPage.content)}">
         <td colspan="10">No hay detalles registrados para esta bitácora.</td>

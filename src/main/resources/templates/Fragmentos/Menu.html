@@ -1,5 +1,29 @@
 <!-- Fragmento del menú de navegación -->
+
 <div th:fragment="navbar" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+    <style>
+        .custom-dropdown {
+            background-color: #e9f5ee;
+            border: 1px solid #c5decf;
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            min-width: 220px;
+        }
+
+        .custom-dropdown .dropdown-item {
+            color: #256d3a;
+            font-weight: 500;
+            border-radius: 0.3rem;
+            transition: all 0.2s ease;
+        }
+
+        .custom-dropdown .dropdown-item:hover {
+            background-color: #d4edda;
+            color: #146c43;
+            font-weight: 600;
+            padding-left: 1.2rem;
+        }
+    </style>
 
     <nav class="navbar navbar-expand-lg shadow-sm" style="background-color: #256d3a;">
         <div class="container-fluid">
@@ -19,7 +43,7 @@
                            role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             UNIDADES Y BITÁCORAS
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="bitacoraDropdown">
+                        <ul class="dropdown-menu custom-dropdown" aria-labelledby="bitacoraDropdown">
                             <li>
                                 <a class="dropdown-item" th:href="@{/Unidades/ListaUnidades}">
                                     Gestión de Unidades y Bitácoras
@@ -46,7 +70,7 @@
                            role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             CATÁLOGO DE DATOS OPERATIVOS
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="datosOperativosDropdown">
+                        <ul class="dropdown-menu custom-dropdown" aria-labelledby="datosOperativosDropdown">
                             <li><a class="dropdown-item" th:href="@{/Catalogo/TipoUnidad}">Tipo de Unidad</a></li>
                             <li><a class="dropdown-item" th:href="@{/Catalogo/TipoCombustible}">Tipo de Combustible</a></li>
                             <li><a class="dropdown-item" th:href="@{/Catalogo/Grifo}">Grifos</a></li>
@@ -58,9 +82,12 @@
             </div>
 
             <!-- Botón cerrar sesión -->
-            <form th:action="@{/logout}" method="post" class="d-flex">
-                <button class="btn btn-sm btn-outline-light" type="submit" title="Cerrar sesión">
-                    <i class="bi bi-box-arrow-right"></i>
+            <form th:action="@{/logout}" method="post" class="d-flex align-items-center">
+                <button class="btn btn-sm btn-outline-light d-flex align-items-center px-3 py-1"
+                        type="submit"
+                        title="Cerrar sesión del sistema">
+                    <i class="bi bi-box-arrow-right me-2"></i>
+                    <span>Cerrar sesión</span>
                 </button>
             </form>
 

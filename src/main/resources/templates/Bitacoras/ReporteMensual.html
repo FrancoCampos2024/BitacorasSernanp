@@ -13,6 +13,18 @@
             width: 98vw;
         }
 
+        body {
+            background-color: #e9f5ee; /* fondo */
+            color: #212529;            /* texto principal */
+        }
+
+        .card, .table, .modal-content {
+            background-color: #ffffff; /* contraste con el fondo */
+            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+            border-radius: 0.5rem;
+        }
+
+
     </style>
 </head>
 <body>
@@ -22,8 +34,13 @@
 
 <!-- Contenido -->
 <div class="container mt-4">
-    <h3 class="mb-4 fw-bold text-success">REPORTE MENSUAL DE BITÁCORAS</h3>
 
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="titulo d-flex align-items-center">
+            <i class="bi bi-journal-text me-2"></i>
+            REPORTE MENSUAL DE BITÁCORAS
+        </h3>
+    </div>
     <!-- Formulario -->
     <form th:action="@{/Unidades/ReporteMensual}" method="get" class="row g-3 align-items-end mb-4">
         <!-- Mes -->

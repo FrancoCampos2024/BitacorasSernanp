@@ -8,8 +8,10 @@
     <link rel="stylesheet" th:href="@{/css/estilos.css}" />
     <style>
         body {
-            background-color: #f5f7fa;
+            background-color: #e9f5ee;
+            color: #212529;
         }
+
         .titulo-seccion {
             font-weight: bold;
             color: #2d4832;
@@ -37,7 +39,25 @@
     </div>
     <div class="card shadow-sm mb-3">
         <div class="d-flex flex-wrap gap-4">
-            <div><strong>Mes:</strong> <span th:text="${bitacora.mes}">Abril</span></div>
+            <div>
+                <strong>Mes:</strong>
+                <span th:switch="${bitacora.mes}">
+                    <span th:case="1">Enero</span>
+                    <span th:case="2">Febrero</span>
+                    <span th:case="3">Marzo</span>
+                    <span th:case="4">Abril</span>
+                    <span th:case="5">Mayo</span>
+                    <span th:case="6">Junio</span>
+                    <span th:case="7">Julio</span>
+                    <span th:case="8">Agosto</span>
+                    <span th:case="9">Septiembre</span>
+                    <span th:case="10">Octubre</span>
+                    <span th:case="11">Noviembre</span>
+                    <span th:case="12">Diciembre</span>
+                    <span th:case="*">Mes inválido</span>
+                </span>
+            </div>
+
             <div><strong>Año:</strong> <span th:text="${bitacora.anio}">2025</span></div>
             <div><strong>Unidad:</strong> <span th:text="${bitacora.unidad.nombre}">15RTX</span></div>
         </div>
@@ -109,7 +129,7 @@
                 <input type="text" class="form-control" th:field="*{serviciengrase}">
             </div>
             <div class="col-md-3">
-                <label class="form-label">Mantenimiento</label>
+                <label class="form-label">Servicio Mantenimiento</label>
                 <input type="text" class="form-control" th:field="*{serviciomantenimiento}">
             </div>
             <div class="col-md-3">
@@ -129,8 +149,8 @@
                 <textarea class="form-control" th:field="*{trabajosrealizados}" rows="3"></textarea>
             </div>
             <div class="col-md-6">
-                <label class="form-label">Anotaciones</label>
-                <textarea class="form-control" th:field="*{anotaciones}" rows="3"></textarea>
+                <label class="form-label">Mantenimiento, respuesto o accesorio nuevo</label>
+                <textarea class="form-control" th:field="*{mantenimiendodescripcion}" rows="3"></textarea>
             </div>
         </div>
 

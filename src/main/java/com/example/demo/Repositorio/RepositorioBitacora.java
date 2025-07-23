@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Optional;
 
 @Repository("RepositorioBitacora")
 public interface RepositorioBitacora extends JpaRepository<BITACORA, Serializable> {
@@ -52,6 +53,8 @@ public interface RepositorioBitacora extends JpaRepository<BITACORA, Serializabl
 
     @Query("SELECT DISTINCT b.anio FROM BITACORA b ORDER BY b.anio DESC")
     List<Integer> obtenerAniosConBitacoras();
+
+    Optional<BITACORA>findByUnidad_IdunidadAndMesAndAnio(int idunidad, int mes, int anio);
 
 
 

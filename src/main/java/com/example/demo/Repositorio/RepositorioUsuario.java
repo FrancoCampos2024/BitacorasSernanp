@@ -10,4 +10,5 @@ import java.util.Optional;
 @Repository("RepositorioUsuario")
 public interface RepositorioUsuario extends JpaRepository<USUARIO, Serializable> {
     Optional<USUARIO> findByNombre(String nombre);
+
 }

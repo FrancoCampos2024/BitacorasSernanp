@@ -9,6 +9,7 @@ import com.lowagie.text.Font;
 import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
+import jakarta.servlet.ServletContext;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.usermodel.Cell;
@@ -28,7 +29,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.YearMonth;
@@ -57,6 +60,8 @@ public class BitacoraControlador {
     private ServicioValecombustible servicioValecombustible;
     @Autowired
     private ServicioDestinovale servicioDestinovale;
+    @Autowired
+    private ServletContext servletContext;
 
     @GetMapping("/Listabitacoras/{id}")
     public String listarbitacorasporUnidades(
@@ -134,6 +139,13 @@ public class BitacoraControlador {
         if (mes <= 0 || mes > 12) {
             redirectAttributes.addFlashAttribute("mostrarModal", true);
             redirectAttributes.addFlashAttribute("advertencia", "Debe seleccionar un mes válido.");
+            redirectAttributes.addFlashAttribute("bitacora", bitacora);
+            return "redirect:/Bitacoras/Listabitacoras/" + id;
+        }
+
+        if(servicioBitacora.existeBitacora(id, anio, mes)) {
+            redirectAttributes.addFlashAttribute("mostrarModal", true);
+            redirectAttributes.addFlashAttribute("advertencia", "Ya existe una bitácora para ese mes y año.");
             redirectAttributes.addFlashAttribute("bitacora", bitacora);
             return "redirect:/Bitacoras/Listabitacoras/" + id;
         }
@@ -346,7 +358,19 @@ public class BitacoraControlador {
             return "Bitacoras/AgregarDetalleBitacoraKM";
         }
 
-        // Guardar si todo OK
+        if (iddVale != null && iddVale > 0) {
+            DESTINOVALE desv= servicioDestinovale.obtenerPorId(iddVale);
+            desv.setSaldorestante(desv.getSaldorestante()-detallebkilometro.getCombustiblegls());
+            servicioDestinovale.agregarDestinovale(desv);
+            detallebkilometro.setDestinovale(servicioDestinovale.obtenerPorId(iddVale));
+        } else {
+            detallebkilometro.setDestinovale(null);
+        }
+
+        if(detallebkilometro.getDestinovale()!=null) {
+            detallebkilometro.setAnotaciones("N° Vale credito: " + detallebkilometro.getDestinovale().getValeCombustible().getNvale() +
+                    " = " + detallebkilometro.getCombustiblegls() + " galones  de " + detallebkilometro.getBitacora().getUnidad().getTipoCombustible().getNombre());
+        }
         servicioDetallebkilometro.agregardetalle(detallebkilometro);
         redirectAttributes.addFlashAttribute("guardadoExito", true);
         return "redirect:/Bitacoras/Detallebitacora/" + idb;
@@ -574,12 +598,20 @@ public class BitacoraControlador {
     @GetMapping("/Eliminar/{iddb}/{idb}")
     public String eliminar(@ModelAttribute DETALLEBHORAS detalleForm,@PathVariable int idb,@PathVariable int iddb) {
         if(servicioBitacora.buscarporid(idb).getUnidad().getTipoUnidad().getMedicion().equals("Km")){
-            servicioDetallebkilometro.elimininardetalle(servicioDetallebkilometro.buscarporid(iddb));
+            DETALLEBKILOMETRO detalleExistente= servicioDetallebkilometro.buscarporid(iddb);
+            if(detalleExistente.getDestinovale()!=null){
+            DESTINOVALE destinovale=servicioDestinovale.obtenerPorId(detalleExistente.getDestinovale().getIddestinovale());
+            destinovale.setSaldorestante(destinovale.getSaldorestante()+detalleExistente.getCombustiblegls());
+            servicioDestinovale.agregarDestinovale(destinovale);
+            }
+            servicioDetallebkilometro.elimininardetalle(detalleExistente);
         }else{
             DETALLEBHORAS detalleExistente = servicioDetallebhoras.obtenerdetalle(iddb);
-            DESTINOVALE destinovale= servicioDestinovale.obtenerPorId(detalleExistente.getDestinovale().getIddestinovale());
-            destinovale.setSaldorestante(destinovale.getSaldorestante()+detalleExistente.getCombustible());
-            servicioDestinovale.agregarDestinovale(destinovale);
+            if(detalleExistente.getDestinovale()!=null) {
+                DESTINOVALE destinovale = servicioDestinovale.obtenerPorId(detalleExistente.getDestinovale().getIddestinovale());
+                destinovale.setSaldorestante(destinovale.getSaldorestante() + detalleExistente.getCombustible());
+                servicioDestinovale.agregarDestinovale(destinovale);
+            }
             servicioDetallebhoras.elimininardetalle(detalleExistente);
         }
         return "redirect:/Bitacoras/Detallebitacora/" + idb;
@@ -636,6 +668,18 @@ public class BitacoraControlador {
         PdfWriter.getInstance(document, response.getOutputStream());
         document.open();
 
+        InputStream is = getClass().getResourceAsStream("/static/IMG/BitacoraHorascaratula.jpg");
+        if (is != null) {
+            Image portada = Image.getInstance(is.readAllBytes());
+            portada.setRotationDegrees(-90f); // gira la imagen -90° (vertical visual)
+            portada.scaleToFit(PageSize.A4.getHeight(), PageSize.A4.getWidth());
+            portada.setAbsolutePosition(0, 0);
+            document.add(portada);
+            document.newPage(); // Sigue con el contenido en horizontal
+        } else {
+            throw new FileNotFoundException("No se encontró la imagen de portada en /static/img/BitacoraHorascaratula.jpg");
+        }
+
         Font fontTitulo = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14);
         Font fontCabeceraPeque = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 8);
         Font fontFilaPeque = FontFactory.getFont(FontFactory.HELVETICA, 7);
@@ -687,18 +731,22 @@ public class BitacoraControlador {
                 tabla.addCell(celdaDato(String.valueOf(d.getHfinal()), fontFilaPeque));
                 tabla.addCell(celdaDato(d.getHoperacion() + " H", fontFilaPeque));
                 tabla.addCell(celdaDato(d.getAceite(), fontFilaPeque));
-                if(d.getCombustible()==0){tabla.addCell(new Phrase( " ", fontFilaPeque));}
-                else{tabla.addCell(new Phrase(d.getCombustible() + " gln", fontFilaPeque));}
+                tabla.addCell(d.getCombustible() == 0 ?
+                        new Phrase(" ", fontFilaPeque) :
+                        new Phrase(d.getCombustible() + " gln", fontFilaPeque));
                 tabla.addCell(celdaDato(d.getDestino(), fontFilaPeque));
                 tabla.addCell(celdaDato(d.getJustificacion(), fontFilaPeque));
-                tabla.addCell(celdaDato(servicioResponsable.buscarResponsable(d.getResponsable().getIdresponsable()).getNombre(), fontFilaPeque));
+                tabla.addCell(celdaDato(
+                        servicioResponsable.buscarResponsable(d.getResponsable().getIdresponsable()).getNombre(),
+                        fontFilaPeque));
 
                 long nvale = 0;
                 if (d.getDestinovale() != null && d.getDestinovale().getValeCombustible() != null) {
                     nvale = d.getDestinovale().getValeCombustible().getNvale();
                 }
-                if(nvale==0){tabla.addCell(new Phrase(" ", fontFilaPeque));}
-                else{tabla.addCell(new Phrase(nvale + "", fontFilaPeque));}
+                tabla.addCell(nvale == 0 ?
+                        new Phrase(" ", fontFilaPeque) :
+                        new Phrase(String.valueOf(nvale), fontFilaPeque));
                 tabla.addCell(celdaDato(d.getReporte(), fontFilaPeque));
 
                 totalHoras += d.getHoperacion();
@@ -708,7 +756,7 @@ public class BitacoraControlador {
             }
         }
 
-        // Fila de Totales
+        // Fila Totales
         PdfPCell totalCell = new PdfPCell(new Phrase("TOTAL", fontCabeceraPeque));
         totalCell.setColspan(3);
         totalCell.setHorizontalAlignment(Element.ALIGN_CENTER);
@@ -723,6 +771,8 @@ public class BitacoraControlador {
         document.add(tabla);
         document.close();
     }
+
+
 
     public void generarPDFKilometros(BITACORA bitacora, HttpServletResponse response) throws Exception {
         response.setContentType("application/pdf");
@@ -741,6 +791,20 @@ public class BitacoraControlador {
         Document document = new Document(PageSize.A4);
         PdfWriter.getInstance(document, response.getOutputStream());
         document.open();
+
+        InputStream is = getClass().getResourceAsStream("/static/IMG/BitacoraKmcaratula.jpg");
+        if (is != null) {
+            Image portada = Image.getInstance(is.readAllBytes());
+            portada.scaleToFit(PageSize.A4.getWidth(), PageSize.A4.getHeight());
+            portada.setAbsolutePosition(
+                    (PageSize.A4.getWidth() - portada.getScaledWidth()) / 2,
+                    (PageSize.A4.getHeight() - portada.getScaledHeight()) / 2
+            );
+            document.add(portada);
+            document.newPage(); // Sigue con el contenido en horizontal
+        } else {
+            throw new FileNotFoundException("No se encontró la imagen de portada en /static/img/BitacoraHorascaratula.jpg");
+        }
 
         Font fontTitulo = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14);
         Font fontCabecera = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 11);
@@ -933,6 +997,7 @@ public class BitacoraControlador {
         YearMonth yearMonth = YearMonth.of(anio, mes);
         int diasDelMes = yearMonth.lengthOfMonth();
 
+
         Font fontTitulo = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14);
         Font fontCabecera = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 11);
         Font fontFila = FontFactory.getFont(FontFactory.HELVETICA, 9);
@@ -941,6 +1006,21 @@ public class BitacoraControlador {
             List<DETALLEBKILOMETRO> detalles = servicioDetallebkilometro.obtenerPorBitacora(bitacora.getIdbitacora());
             Map<Integer, DETALLEBKILOMETRO> mapaDetalles = detalles.stream()
                     .collect(Collectors.toMap(DETALLEBKILOMETRO::getDia, d -> d));
+
+
+            InputStream is = getClass().getResourceAsStream("/static/IMG/BitacoraKmcaratula.jpg");
+            if (is != null) {
+                Image portada = Image.getInstance(is.readAllBytes());
+                portada.scaleToFit(PageSize.A4.getWidth(), PageSize.A4.getHeight());
+                portada.setAbsolutePosition(
+                        (PageSize.A4.getWidth() - portada.getScaledWidth()) / 2,
+                        (PageSize.A4.getHeight() - portada.getScaledHeight()) / 2
+                );
+                document.add(portada);
+                document.newPage(); // Sigue con el contenido en horizontal
+            } else {
+                throw new FileNotFoundException("No se encontró la imagen de portada en /static/img/BitacoraHorascaratula.jpg");
+            }
 
             int velocimetroinicial = 0, velocimetrofinal = 0;
             double totalCombustible = 0;
@@ -1017,56 +1097,104 @@ public class BitacoraControlador {
 
             document.add(tabla1);
 
-            // --- Página 2: RESUMEN MENSUAL ---
+            //----Hoja Mantenimientos-----
             document.newPage();
-            Paragraph titulo2 = new Paragraph("RESUMEN MENSUAL", fontTitulo);
-            titulo2.setAlignment(Element.ALIGN_CENTER);
-            document.add(titulo2);
 
-            Paragraph cabecera2 = new Paragraph("Periodo de 01 DE " + obtenerNombreMes(mes).toUpperCase() + " al " + diasDelMes + " DE " + obtenerNombreMes(mes).toUpperCase() + " " + anio +
-                    "\nVelocímetro Comienzo: " + velocimetroinicial + "  Final: " + velocimetrofinal +
-                    "\nAgencia: PNSDV    Placa: " + bitacora.getUnidad().getIdentificador(), fontCabecera);
-            cabecera2.setSpacingAfter(10f);
-            document.add(cabecera2);
+            Paragraph tituloMantenimiento = new Paragraph("SERVICIOS DE MANTENIMIENTO REALIZADOS", fontCabecera);
+            tituloMantenimiento.setAlignment(Element.ALIGN_CENTER);
+            tituloMantenimiento.setSpacingAfter(8f);
+            document.add(tituloMantenimiento);
 
-            PdfPTable tabla2 = new PdfPTable(3);
+            PdfPTable tabla2 = new PdfPTable(2);
             tabla2.setWidthPercentage(100);
-            tabla2.setWidths(new float[]{1f, 1.15f, 7f}); // ← CORREGIDO: 3 columnas bien definidas
-            tabla2.addCell(new PdfPCell(new Phrase("Día", fontCabecera)));
-            tabla2.addCell(new PdfPCell(new Phrase("Kilómetros", fontCabecera)));
-            tabla2.addCell(new PdfPCell(new Phrase("Detallar trabajos realizados", fontCabecera)));
+            tabla2.setWidths(new float[]{1f, 7f});
+
+            tabla2.addCell(new PdfPCell(new Phrase("DÍA", fontCabecera)));
+            tabla2.addCell(new PdfPCell(new Phrase("SERVICIOS DE MANTENIMIENTO REALIZADOS", fontCabecera)));
+
+            List<Integer> diasConMantenimiento = detalles.stream()
+                    .filter(d -> d.getMantenimiendodescripcion() != null && !d.getMantenimiendodescripcion().isBlank())
+                    .map(DETALLEBKILOMETRO::getDia)
+                    .sorted()
+                    .collect(Collectors.toList());
+
+            for (Integer dia : diasConMantenimiento) {
+                DETALLEBKILOMETRO d = mapaDetalles.get(dia);
+                tabla2.addCell(new Phrase(String.valueOf(dia+"/"+d.getBitacora().getMes()), fontFila));
+                tabla2.addCell(new Phrase(d.getMantenimiendodescripcion(), fontFila));
+            }
 
             for (int dia = 1; dia <= diasDelMes; dia++) {
-                DETALLEBKILOMETRO d = mapaDetalles.get(dia);
-                tabla2.addCell(new Phrase(String.valueOf(dia), fontFila));
-                tabla2.addCell(new Phrase((d != null && d.getKmrecorridos() != 0) ? String.valueOf(d.getKmrecorridos()) : " ", fontFila));
-                tabla2.addCell(new Phrase((d != null && d.getTrabajosrealizados() != null) ? d.getTrabajosrealizados() : " ", fontFila));
+                if (!diasConMantenimiento.contains(dia)) {
+                    tabla2.addCell(new Phrase(" ", fontFila));
+                    tabla2.addCell(new Phrase(" ", fontFila));
+                }
             }
+
             document.add(tabla2);
 
 
-            // --- Página 3: ANOTACIONES ---
+            // --- Página 3: RESUMEN MENSUAL ---
             document.newPage();
-            Paragraph titulo3 = new Paragraph("ANOTACIONES", fontTitulo);
+            Paragraph titulo3 = new Paragraph("RESUMEN MENSUAL", fontTitulo);
             titulo3.setAlignment(Element.ALIGN_CENTER);
             document.add(titulo3);
 
-            Paragraph cabecera3 = new Paragraph("AGENCIA: PNSDV\nPLACA: " + bitacora.getUnidad().getIdentificador(), fontCabecera);
+            Paragraph cabecera3 = new Paragraph("Periodo de 01 DE " + obtenerNombreMes(mes).toUpperCase() + " al " + diasDelMes + " DE " + obtenerNombreMes(mes).toUpperCase() + " " + anio +
+                    "\nVelocímetro Comienzo: " + velocimetroinicial + "  Final: " + velocimetrofinal +
+                    "\nAgencia: PNSDV    Placa: " + bitacora.getUnidad().getIdentificador(), fontCabecera);
             cabecera3.setSpacingAfter(10f);
             document.add(cabecera3);
 
-            PdfPTable tabla3 = new PdfPTable(2);
+            PdfPTable tabla3 = new PdfPTable(3);
             tabla3.setWidthPercentage(100);
-            tabla3.setWidths(new float[]{1f, 9f});
+            tabla3.setWidths(new float[]{1f, 1.15f, 7f}); // ← CORREGIDO: 3 columnas bien definidas
             tabla3.addCell(new PdfPCell(new Phrase("Día", fontCabecera)));
-            tabla3.addCell(new PdfPCell(new Phrase("Anotaciones", fontCabecera)));
+            tabla3.addCell(new PdfPCell(new Phrase("Kilómetros", fontCabecera)));
+            tabla3.addCell(new PdfPCell(new Phrase("Detallar trabajos realizados", fontCabecera)));
 
             for (int dia = 1; dia <= diasDelMes; dia++) {
                 DETALLEBKILOMETRO d = mapaDetalles.get(dia);
                 tabla3.addCell(new Phrase(String.valueOf(dia), fontFila));
-                tabla3.addCell(new Phrase((d != null && d.getAnotaciones() != null) ? d.getAnotaciones() : " ", fontFila));
+                tabla3.addCell(new Phrase((d != null && d.getKmrecorridos() != 0) ? String.valueOf(d.getKmrecorridos()) : " ", fontFila));
+                tabla3.addCell(new Phrase((d != null && d.getTrabajosrealizados() != null) ? d.getTrabajosrealizados() : " ", fontFila));
             }
             document.add(tabla3);
+
+
+            // --- Página 4: ANOTACIONES ---
+            document.newPage();
+            Paragraph titulo4 = new Paragraph("ANOTACIONES", fontTitulo);
+            titulo4.setAlignment(Element.ALIGN_CENTER);
+            titulo4.setSpacingAfter(8f);
+            document.add(titulo4);
+
+            PdfPTable tabla4 = new PdfPTable(2);
+            tabla4.setWidthPercentage(100);
+            tabla4.setWidths(new float[]{1f, 9f});
+            tabla4.addCell(new PdfPCell(new Phrase("Día", fontCabecera)));
+            tabla4.addCell(new PdfPCell(new Phrase("Anotaciones", fontCabecera)));
+
+            List<Integer> diasConVale = detalles.stream()
+                    .filter(d -> d.getDestinovale() != null) //
+                    .map(DETALLEBKILOMETRO::getDia)
+                    .sorted()
+                    .collect(Collectors.toList());
+
+
+            for (Integer dia : diasConVale) {
+                DETALLEBKILOMETRO d = mapaDetalles.get(dia);
+                tabla4.addCell(new Phrase(String.valueOf(dia+"/"+d.getBitacora().getMes()), fontFila));
+                tabla4.addCell(new Phrase(d.getAnotaciones(), fontFila));
+            }
+
+            for (int dia = 1; dia <= diasDelMes; dia++) {
+                if (!diasConVale.contains(dia)) {
+                    tabla4.addCell(new Phrase(" ", fontFila));
+                    tabla4.addCell(new Phrase(" ", fontFila));
+                }
+            }
+            document.add(tabla4);
 
 
         } else {
@@ -1074,6 +1202,18 @@ public class BitacoraControlador {
             List<DETALLEBHORAS> detalles = servicioDetallebhoras.obtenerPorBitacora(bitacora.getIdbitacora());
             Map<Integer, DETALLEBHORAS> mapaDetalles = detalles.stream()
                     .collect(Collectors.toMap(DETALLEBHORAS::getDia, d -> d));
+
+            InputStream is = getClass().getResourceAsStream("/static/IMG/BitacoraHorascaratula.jpg");
+            if (is != null) {
+                Image portada = Image.getInstance(is.readAllBytes());
+                portada.setRotationDegrees(-90f); // gira la imagen -90° (vertical visual)
+                portada.scaleToFit(PageSize.A4.getHeight(), PageSize.A4.getWidth());
+                portada.setAbsolutePosition(0, 0);
+                document.add(portada);
+                document.newPage(); // Sigue con el contenido en horizontal
+            } else {
+                throw new FileNotFoundException("No se encontró la imagen de portada en /static/img/BitacoraHorascaratula.jpg");
+            }
 
             Font fontCabeceraPeque = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 8);
             Font fontFilaPeque = FontFactory.getFont(FontFactory.HELVETICA, 7);

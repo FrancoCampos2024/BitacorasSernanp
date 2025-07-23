@@ -19,7 +19,7 @@ public class ConfiguracionSeguridad {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/css/**", "/img/**", "/js/**", "/login", "/IMG/**").permitAll()
+                        .requestMatchers("/css/**", "/js/**", "/login", "/IMG/**").permitAll()
                         .requestMatchers("/Bitacoras/**", "/Unidades/**").hasAnyRole("ADMIN", "GUARDAPARQUE")
                         .requestMatchers("/Bienvenido").hasAnyRole("ADMIN", "GUARDAPARQUE")
                         .requestMatchers("/**").hasRole("ADMIN")
@@ -28,6 +28,7 @@ public class ConfiguracionSeguridad {
                 .formLogin(form -> form
                         .loginPage("/login")
                         .successHandler((request, response, authentication) -> {
+                            new org.springframework.security.web.savedrequest.HttpSessionRequestCache().removeRequest(request, response);
                             var roles = authentication.getAuthorities().toString();
                             if (roles.contains("ROLE_ADMIN")) {
                                 response.sendRedirect("/Bienvenido");
@@ -46,13 +47,17 @@ public class ConfiguracionSeguridad {
                         .clearAuthentication(true)
                         .deleteCookies("JSESSIONID")
                 )
-                // ✅ Esto es lo correcto para Spring Security 6+
+                .sessionManagement(session -> session
+                        .maximumSessions(-1)
+                        .maxSessionsPreventsLogin(false)
+                )
                 .headers(header -> header
                         .frameOptions(frame -> frame.sameOrigin())
                 );
 
         return http.build();
     }
+
 
 
     @Bean

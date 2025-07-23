@@ -10,6 +10,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
+
 @Service("ServicioUnidades")
 public class ImplUnidades implements ServicioUnidades {
     @Autowired
@@ -54,5 +56,10 @@ public class ImplUnidades implements ServicioUnidades {
     @Override
     public Page<UNIDADES> buscarPorTipoUnidad(String tipoUnidad, Pageable pageable) {
         return repositorioUnidades.findByTipoUnidad_Nombre(tipoUnidad, pageable);
+    }
+
+    @Override
+    public UNIDADES findByIdentificador(String identificador) {
+        return repositorioUnidades.findByIdentificador(identificador);
     }
 }

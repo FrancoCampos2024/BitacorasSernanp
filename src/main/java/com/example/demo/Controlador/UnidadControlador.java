@@ -135,6 +135,12 @@ public class UnidadControlador {
             return "Debe seleccionar un tipo de unidad.";
         }
 
+        UNIDADES unidadexistente = servicioUnidades.findByIdentificador(unidad.getIdentificador());
+        if (unidadexistente != null) {
+            if (unidadexistente.getIdunidad()!=(unidad.getIdunidad())) {
+                return "Identificador ya existente para otra unidad.";
+            }
+        }
         return null;
     }
 

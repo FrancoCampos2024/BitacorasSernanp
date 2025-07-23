@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Optional;
 
 
 @Repository("RepositorioUnidades")
@@ -30,6 +31,9 @@ public interface RepositorioUnidades extends JpaRepository<UNIDADES, Serializabl
 
     Page<UNIDADES> findByIdentificadorContainingIgnoreCase(String identificador, Pageable pageable);
     Page<UNIDADES> findByTipoUnidad_Nombre(String nombre, Pageable pageable);
+    UNIDADES findByIdentificador(String identificador);
+
+
 
 
 }

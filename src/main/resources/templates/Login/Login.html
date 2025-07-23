@@ -2,37 +2,55 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Inicio de Sesión - SIGCOB</title>
+    <title>Inicio de Sesión - SIGCOB | SERNANP</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
     <style>
         body {
             background: url('/IMG/SierraDivisor.jpg') no-repeat center center fixed;
             background-size: cover;
             font-family: 'Segoe UI', sans-serif;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .login-box {
-            background-color: rgba(255, 255, 255, 0.96);
-            padding: 35px 30px;
-            border-radius: 14px;
-            max-width: 420px;
-            margin: 10vh auto;
-            box-shadow: 0 0 20px rgba(0,0,0,0.25);
-            border: 1px solid #cfd0d2;
+            background-color: rgba(255, 255, 255, 0.93);
+            border-radius: 1.2rem;
+            padding: 2.5rem;
+            max-width: 460px;
+            width: 100%;
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.25);
+            border: 1px solid #d0d0d0;
+            text-align: center;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .logo-container img {
+            max-height: 60px;
+            margin: 0 10px;
         }
 
         .login-title {
-            font-size: 1.9rem;
+            font-size: 1.8rem;
             font-weight: bold;
-            text-align: center;
             color: #256d3a;
         }
 
         .login-subtitle {
             font-size: 1rem;
-            text-align: center;
-            color: #555;
+            color: #444;
             margin-bottom: 25px;
         }
 
@@ -43,15 +61,15 @@
 
         .form-control:focus {
             border-color: #256d3a;
-            box-shadow: 0 0 0 0.15rem rgba(37, 109, 58, 0.25);
+            box-shadow: 0 0 0 0.2rem rgba(37, 109, 58, 0.25);
         }
 
         .btn-login {
             background-color: #256d3a;
             color: white;
             font-weight: 600;
-            border-radius: 8px;
-            transition: all 0.3s ease;
+            border-radius: 0.5rem;
+            transition: 0.3s;
         }
 
         .btn-login:hover {
@@ -61,67 +79,100 @@
         .link-password {
             display: block;
             text-align: center;
-            margin-top: 15px;
+            margin-top: 18px;
             font-size: 0.9rem;
         }
 
-        .alert {
-            font-size: 0.9rem;
+        .bi-whatsapp {
+            color: #25D366;
+        }
+
+        @media (max-width: 480px) {
+            .logo-container {
+                flex-direction: column;
+            }
+        }
+        .logo-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 40px; /* Ajusta el espacio de los bordes */
+        }
+
+        .logo-container img {
+            height: 100px; /* Ajusta el tamaño según tu diseño */
         }
     </style>
 </head>
 <body>
 
 <div class="login-box">
-    <h1 class="login-title">BIENVENIDO A SIGCOB</h1>
-    <p class="login-subtitle">Sistema de Gestión de Bitácoras del Parque Nacional Sierra del Divisor</p>
 
-    <form class="needs-validation" novalidate th:action="@{/login}" method="post">
-        <div class="mb-3">
-            <label for="username" class="form-label">* USUARIO</label>
+    <!-- LOGOS SUPERIORES -->
+    <div class="logo-container">
+        <img src="/IMG/Peruescudo.png" alt="Escudo del Perú">
+        <img src="/IMG/LogoSernanp.png" alt="Logo SERNANP">
+    </div>
+
+    <h1 class="login-title">BIENVENIDO A SIGCOB</h1>
+    <p class="login-subtitle">Sistema de Gestión de Bitácoras del Parque Nacional Sierra del Divisor - SERNANP</p>
+
+    <!-- ALERTAS -->
+    <div th:if="${param.error}" class="alert alert-danger text-center" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        Usuario o contraseña incorrecta. Intente nuevamente.
+    </div>
+
+    <div th:if="${param.logout}" class="alert alert-success text-center" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i>
+        Has cerrado sesión correctamente.
+    </div>
+
+    <!-- FORMULARIO LOGIN -->
+    <form class="needs-validation mt-3" novalidate th:action="@{/login}" method="post">
+        <div class="mb-3 text-start">
+            <label for="username" class="form-label">USUARIO<span class="text-danger">*</span></label>
             <input type="text" id="username" name="username" class="form-control" placeholder="Ingrese su usuario" required>
-            <div class="invalid-feedback">
-                Por favor, ingrese su usuario.
-            </div>
+            <div class="invalid-feedback">Por favor, ingrese su usuario.</div>
         </div>
 
-        <div class="mb-3">
-            <label for="password" class="form-label">* CONTRASEÑA</label>
+        <div class="mb-3 text-start">
+            <label for="password" class="form-label">CONTRASEÑA<span class="text-danger">*</span></label>
             <input type="password" id="password" name="password" class="form-control" placeholder="Ingrese su contraseña" required>
-            <div class="invalid-feedback">
-                Por favor, ingrese su contraseña.
-            </div>
+            <div class="invalid-feedback">Por favor, ingrese su contraseña.</div>
         </div>
 
         <div class="d-grid mt-4">
             <button type="submit" class="btn btn-login">INICIAR SESIÓN</button>
         </div>
-        <a href="https://web.whatsapp.com/send?phone=51978950194&text=Hola,%20olvidé%20mi%20contraseña%20del%20sistema%20SIGCOB"
+
+        <a href="https://web.whatsapp.com/send?phone=51931483844&text=Hola,%20olvidé%20mi%20contraseña%20del%20sistema%20SIGCOB"
            target="_blank"
            class="link-password text-decoration-none text-primary fw-semibold">
-            <i class="bi bi-whatsapp me-1"></i> ¿Se olvidó la contraseña?
+            <i class="bi bi-whatsapp me-1"></i> ¿Necesita ayuda para acceder? Escríbanos por WhatsApp
         </a>
-
-
     </form>
 </div>
-<script>
-    // Validación personalizada Bootstrap
-    (function () {
-        'use strict'
-        const forms = document.querySelectorAll('.needs-validation')
-        Array.from(forms).forEach(function (form) {
-            form.addEventListener('submit', function (event) {
-                if (!form.checkValidity()) {
-                    event.preventDefault()
-                    event.stopPropagation()
-                }
-                form.classList.add('was-validated')
-            }, false)
-        })
-    })();
-</script>
 
+<script>
+    (() => {
+        'use strict';
+        const forms = document.querySelectorAll('.needs-validation');
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    })();
+    // 🔁 Eliminar parámetros de error/logout de la URL al cargar
+    if (window.location.search.includes("error") || window.location.search.includes("logout")) {
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+</script>
 
 </body>
 </html>

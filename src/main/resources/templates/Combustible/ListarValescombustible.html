@@ -8,6 +8,21 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/estilos.css}" href="/css/estilos.css" />
+
+    <style >
+        body {
+            background-color: #e9f5ee; /* fondo */
+            color: #212529;            /* texto principal */
+        }
+
+        .card, .table, .modal-content {
+            background-color: #ffffff; /* contraste con el fondo */
+            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+            border-radius: 0.5rem;
+        }
+
+
+    </style>
 </head>
 <body>
 
@@ -95,20 +110,29 @@
                         <td th:text="${vale.tipoCombustible.nombre}"></td>
                         <td th:text="${vale.cantidad}"></td>
                         <td th:text="${vale.saldorestante}"></td>
-                        <td>
-                            <a th:href="@{/Combustible/Detalle/{id}(id=${vale.idvcombustible})}" class="icono-accion" title="Ver Información">
-                                <i class="bi bi-info-circle-fill"></i>
-                            </a>
+                        <td class="text-center">
+                            <div class="d-flex justify-content-center gap-2 flex-wrap">
 
-                            <!-- Solo mostrar si NO ha sido consumido -->
-                            <span th:if="${vale.saldorestante == vale.cantidad}">
-                                <a th:href="@{/Combustible/Editar/{id}(id=${vale.idvcombustible})}" class="icono-accion" title="Editar">
-                                    <i class="bi bi-pencil-square"></i>
-                                    </a>
-                            </span>
+                                <!-- Ver Información -->
+                                <a th:href="@{/Combustible/Detalle/{id}(id=${vale.idvcombustible})}"
+                                   class="btn btn-sm btn-outline-success d-flex align-items-center"
+                                   title="Ver información del vale">
+                                    <i class="bi bi-info-circle-fill me-1"></i> Info
+                                </a>
+
+                                <!-- Mostrar botón Editar solo si NO ha sido consumido -->
+                                <span th:if="${vale.saldorestante == vale.cantidad}">
+    <a th:href="@{/Combustible/Editar/{id}(id=${vale.idvcombustible})}"
+       class="btn btn-sm btn-outline-warning d-flex align-items-center"
+       title="Editar vale">
+        <i class="bi bi-pencil-square me-1"></i> Editar
+    </a>
+</span>
 
 
+                            </div>
                         </td>
+
                     </tr>
                     </tbody>
                 </table>

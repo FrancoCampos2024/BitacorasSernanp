@@ -4,7 +4,7 @@
         <div class="modal-dialog">
             <div class="modal-content border-0 shadow">
 
-                <form th:action="@{/Unidades/Agregar}" th:object="${unidad}" method="post">
+                <form th:action="@{/Unidades/Agregar}" th:object="${unidad}" method="post" onsubmit="deshabilitarBoton(this)">
                     <div class="modal-header" style="background-color: #275d44;">
                         <h5 class="modal-title fw-bold text-white" id="modalNuevaUnidadLabel">
                             <i class="bi bi-journal-plus me-2"></i> REGISTRO DE UNIDAD
@@ -56,7 +56,9 @@
                         <a th:href="@{/Unidades/ListaUnidades}" class="btn btn-outline-secondary rounded-pill">
                             <i class="bi bi-x-circle me-1"></i> Cancelar
                         </a>
-                        <button type="submit" class="btn btn-success fw-bold">Registrar</button>
+                        <button id="btnRegistrarUnidad" type="submit" class="btn btn-success fw-bold">
+                            Registrar
+                        </button>
                     </div>
                 </form>
 
@@ -64,3 +66,11 @@
         </div>
     </div>
 </div>
+
+<script>
+    function deshabilitarBoton(formulario) {
+        const boton = formulario.querySelector("button[type='submit']");
+        boton.disabled = true;
+        boton.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Guardando...';
+    }
+</script>

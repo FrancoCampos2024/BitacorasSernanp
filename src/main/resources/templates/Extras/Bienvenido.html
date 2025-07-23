@@ -5,10 +5,17 @@
     <title>SIGCOB - Sistema de Bitácoras</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.css" rel="stylesheet">
-    <link rel="stylesheet" th:href="@{/css/estilos.css}" href="/css/estilos.css" />
+    <link rel="stylesheet" th:href="@{/css/estilos.css}" />
     <style>
         body {
-            background-color: #f8f9fa;
+            background-color: #e9f5ee; /* fondo */
+            color: #212529;            /* texto principal */
+        }
+
+        .card, .table, .modal-content {
+            background-color: #ffffff; /* contraste con el fondo */
+            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+            border-radius: 0.5rem;
         }
 
         .contenedor-bienvenida {
@@ -75,7 +82,7 @@
                         </p>
                     </div>
                     <div class="col-md-5 text-center">
-                        <img src="/IMG/img.png" alt="Logo SERNANP" class="logo-sernanp img-fluid">
+                        <img src="/IMG/LogoSernanp.png" alt="Logo SERNANP" class="logo-sernanp img-fluid">
                     </div>
                 </div>
             </div>
@@ -83,7 +90,10 @@
     </div>
 </div>
 
+
 <!-- JS Bootstrap -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+
 </body>
 </html>

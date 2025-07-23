@@ -6,9 +6,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" th:href="@{/css/estilos.css}" href="/css/estilos.css" />
     <style>
-        body {
-            background-color: #f2f4f8;
-        }
         .titulo-seccion {
             font-weight: bold;
             color: #2d4832;
@@ -33,8 +30,18 @@
         #boton-nuevo {
             position: absolute;
             top: 5px;
-            right: 110px;
+            right: 5px;
             z-index: 10;
+        }
+        body {
+            background-color: #e9f5ee; /* fondo */
+            color: #212529;            /* texto principal */
+        }
+
+        .card, .table, .modal-content {
+            background-color: #ffffff; /* contraste con el fondo */
+            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+            border-radius: 0.5rem;
         }
     </style>
 </head>
@@ -46,7 +53,12 @@
 
 <!-- Contenido -->
 <div class="container mt-4">
-    <div class="titulo-seccion">LISTADO DE UNIDADES</div>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="titulo d-flex align-items-center">
+            <i class="bi bi-truck me-2"></i>
+            LISTADO DE UNIDADES
+        </h3>
+    </div>
 
     <!-- Filtro compacto de unidades -->
     <div class="row justify-content-center"> <!-- Fila para alinear ambos -->
@@ -104,11 +116,11 @@
 
 
     <br><br>
-    <!-- Contenido principal con tabla y gestión auxiliar -->
+
     <div class="row justify-content-center">
         <!-- Tabla de unidades -->
-        <div class="col-lg-10">
-            <div class="table-responsive">
+        <div class="col-12">
+        <div class="table-responsive">
                 <div id="resultadoUnidades" th:fragment="tablaUnidades">
                 <table class="table table-bordered text-center align-middle">
                     <thead class="table-light">
@@ -135,23 +147,36 @@
                                   th:classappend="${unidad.estado} ? ' bg-success' : ' bg-secondary'">
                             </span>
                         </td>
-                        <td>
-                            <a th:href="@{/Bitacoras/Listabitacoras/{id}(id=${unidad.idunidad})}"
-                               class="icono-accion text-primary"
-                               title="Ver Bitácora">
-                                <i class="bi bi-journal-text"></i>
-                            </a>
-                            <a th:href="@{/Unidades/Editar/{id}(id=${unidad.idunidad})}" class="icono-accion" title="Editar">
-                                <i class="bi bi-pencil-square"></i>
-                            </a>
+                        <td class="text-center">
+                            <div class="d-flex justify-content-center gap-2 flex-wrap">
 
-                            <a href="#" class="icono-accion" title="Cambiar estado"
-                               th:onclick="'abrirModalCambioEstado(' + ${unidad.idunidad} + ')'">
-                                <i th:class="${unidad.estado} ? 'bi bi-toggle-on text-success' : 'bi bi-toggle-off text-danger'"></i>
-                            </a>
+                                <!-- Ver Bitácora -->
+                                <a th:href="@{/Bitacoras/Listabitacoras/{id}(id=${unidad.idunidad})}"
+                                   class="btn btn-sm btn-outline-primary d-flex align-items-center"
+                                   title="Ver Bitácora">
+                                    <i class="bi bi-journal-text me-1"></i> Bitácora
+                                </a>
 
+                                <!-- Editar unidad -->
+                                <a th:href="@{/Unidades/Editar/{id}(id=${unidad.idunidad})}"
+                                   class="btn btn-sm btn-outline-warning d-flex align-items-center"
+                                   title="Editar unidad">
+                                    <i class="bi bi-pencil-square me-1"></i> Editar
+                                </a>
 
+                                <!-- Cambiar estado -->
+                                <a href="#"
+                                   th:onclick="'abrirModalCambioEstado(' + ${unidad.idunidad} + ')'"
+                                   class="btn btn-sm d-flex align-items-center"
+                                   th:classappend="${unidad.estado} ? 'btn-outline-success' : 'btn-outline-danger'"
+                                   title="Cambiar estado">
+                                    <i th:class="${unidad.estado} ? 'bi bi-toggle-on me-1' : 'bi bi-toggle-off me-1'"></i>
+                                    <span th:text="${unidad.estado} ? 'Activo' : 'Inactivo'">Estado</span>
+                                </a>
+
+                            </div>
                         </td>
+
                     </tr>
                     <tr th:if="${#lists.isEmpty(unidades)}">
                         <td colspan="6">No se encontraron unidades</td>

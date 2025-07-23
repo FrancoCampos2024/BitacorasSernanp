@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.io.ByteArrayOutputStream;
 import java.util.List;
+import java.util.Optional;
 
 @Service("ServicioBitacora")
 public class ImplBitacora implements ServicioBitacora {
@@ -86,5 +87,12 @@ public class ImplBitacora implements ServicioBitacora {
     public List<Integer> obtenerAniosDisponibles() {
         return repositorioBitacora.obtenerAniosConBitacoras();
     }
+
+    @Override
+    public boolean existeBitacora(int idunidad, int mes, int anio) {
+        Optional<BITACORA> bitacora = repositorioBitacora.findByUnidad_IdunidadAndMesAndAnio(idunidad, mes, anio);
+        return bitacora.isPresent();
+    }
+
 
 }

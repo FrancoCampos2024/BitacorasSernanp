@@ -21,14 +21,24 @@
     .btn-nuevo:hover {
       background-color: #1f5c32;
     }
+    body {
+      background-color: #e9f5ee;
+      color: #212529;
+    }
+
+    .card, .table, .modal-content {
+      background-color: #ffffff;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+      border-radius: 0.5rem;
+    }
 
   </style>
 </head>
 <body>
 
 <div th:replace="Fragmentos/Menu :: navbar"></div>
-<div th:replace="Tipocombustible/AgregarTipoCombustible :: modalNuevoTipoCombustible (${TipoCombustible})"></div>
-<div th:replace="Tipocombustible/EditarTipoCombustible :: modalEditarTipoCombustible (${TipoCombustiblebd})"></div>
+<div th:replace="TipoCombustible/AgregarTipoCombustible :: modalNuevoTipoCombustible (${TipoCombustible})"></div>
+<div th:replace="TipoCombustible/EditarTipoCombustible :: modalEditarTipoCombustible (${TipoCombustiblebd})"></div>
 
 <div class="container mt-4">
   <div class="titulo-seccion mb-3">

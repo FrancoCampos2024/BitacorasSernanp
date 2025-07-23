@@ -8,9 +8,18 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
 
     <style>
+
         body {
-            background-color: #f2f4f8;
+            background-color: #e9f5ee;
+            color: #212529;
         }
+
+        .card, .table, .modal-content {
+            background-color: #ffffff;
+            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+            border-radius: 0.5rem;
+        }
+
         .titulo-seccion {
             font-weight: bold;
             color: #2d4832;
@@ -112,22 +121,25 @@
 
 
 
-    <div class="d-flex justify-content-end mb-3">
-        <a th:if="${unidad.estado}"
-           class="btn btn-sm fw-bold text-white shadow-sm"
-           style="background-color: #275d44;"
-           data-bs-toggle="modal"
-           data-bs-target="#modalNuevaBitacora">
-            <i class="bi bi-plus-circle"></i> Nueva Bitácora
-        </a>
+    <div style="width: 75%; margin: 0 auto;" class="mb-3">
+        <div class="d-flex justify-content-end">
+            <a th:if="${unidad.estado}"
+               class="btn btn-sm fw-bold text-white shadow-sm"
+               style="background-color: #275d44;"
+               data-bs-toggle="modal"
+               data-bs-target="#modalNuevaBitacora">
+                <i class="bi bi-plus-circle"></i> Nueva Bitácora
+            </a>
 
-        <a th:if="${!unidad.estado}"
-           class="btn btn-sm fw-bold text-white shadow-sm disabled"
-           style="background-color: #ccc; cursor: not-allowed;"
-           onclick="return false;">
-            <i class="bi bi-x-circle"></i> Unidad Inactiva
-        </a>
+            <a th:if="${!unidad.estado}"
+               class="btn btn-sm fw-bold text-white shadow-sm disabled ms-2"
+               style="background-color: #ccc; cursor: not-allowed;"
+               onclick="return false;">
+                <i class="bi bi-x-circle"></i> Unidad Inactiva
+            </a>
+        </div>
     </div>
+
 
 
 
@@ -148,24 +160,34 @@
                 </td>
 
                 <td>
-                    <div class="d-flex justify-content-center gap-2">
+                    <div class="d-flex justify-content-center gap-2 flex-wrap">
+
+                        <!-- Ver Detalle -->
                         <a th:href="@{/Bitacoras/Detallebitacora/{id}(id=${bitacora.idbitacora})}"
-                           class="btn btn-sm btn-outline-primary px-3" title="Ver detalle">
+                           class="btn btn-sm btn-outline-primary px-3 d-flex align-items-center"
+                           title="Ver detalle de bitácora">
                             <i class="bi bi-clipboard-data me-1"></i> Detalle
                         </a>
+
+                        <!-- Descargar PDF -->
                         <a th:href="@{/Bitacoras/ExportarPartePDF/{id}(id=${bitacora.idbitacora})}"
-                           class="btn btn-outline-danger btn-sm" target="_blank" title="Descargar PDF">
-                            <i class="bi bi-file-earmark-pdf-fill"></i> PDF
+                           class="btn btn-sm btn-outline-danger d-flex align-items-center"
+                           target="_blank"
+                           title="Descargar reporte en PDF">
+                            <i class="bi bi-file-earmark-arrow-down-fill me-1"></i> Descargar PDF
                         </a>
 
+                        <!-- Vista previa PDF -->
                         <button type="button"
-                                class="btn btn-outline-success btn-sm"
-                                th:onclick="'mostrarVistaPrevia(' + ${bitacora.idbitacora} + ')'">
-                            <i class="bi bi-eye"></i> Vista previa
+                                class="btn btn-sm btn-outline-success d-flex align-items-center"
+                                th:onclick="'mostrarVistaPrevia(' + ${bitacora.idbitacora} + ')'"
+                                title="Vista previa del PDF">
+                            <i class="bi bi-eye me-1"></i> Vista previa
                         </button>
 
                     </div>
                 </td>
+
             </tr>
             </tbody>
         </table>

@@ -35,6 +35,7 @@ public class DETALLEBKILOMETRO {
 
     private String trabajosrealizados;
     private String anotaciones;
+    private String Mantenimiendodescripcion;
 
     @ManyToOne
     @JoinColumn(name="idresponsable", foreignKey = @ForeignKey(name = "fk_detallekm_responsable"))
@@ -185,4 +186,11 @@ public class DETALLEBKILOMETRO {
         this.responsable = responsable;
     }
 
+    public String getMantenimiendodescripcion() {
+        return Mantenimiendodescripcion;
+    }
+
+    public void setMantenimiendodescripcion(String mantenimiendodescripcion) {
+        Mantenimiendodescripcion = mantenimiendodescripcion;
+    }
 }

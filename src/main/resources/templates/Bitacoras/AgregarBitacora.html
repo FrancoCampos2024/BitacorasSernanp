@@ -60,6 +60,17 @@
                             <i class="bi bi-check-circle me-1"></i> Guardar
                         </button>
                     </div>
+                    <script>
+                        document.addEventListener("DOMContentLoaded", function () {
+                            const form = document.querySelector('#modalNuevaBitacora form');
+                            const submitBtn = form.querySelector('button[type="submit"]');
+
+                            form.addEventListener('submit', function () {
+                                submitBtn.disabled = true;
+                                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Guardando...';
+                            });
+                        });
+                    </script>
                 </form>
             </div>
         </div>
